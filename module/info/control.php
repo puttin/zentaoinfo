@@ -286,7 +286,7 @@ class info extends control
 			die(js::reload('parent'));
 		}
 	}
-	public function manageChild($rootID)
+	public function TreeManageChild($rootID)
 	{
 		if(!empty($_POST))
 		{
@@ -294,7 +294,7 @@ class info extends control
 			die(js::reload('parent'));
 		}
 	}
-	public function updateOrder()
+	public function TreeUpdateOrder()
 	{
 		if(!empty($_POST))
 		{
@@ -302,7 +302,7 @@ class info extends control
 			die(js::reload('parent'));
 		}
 	}
-	public function ajaxGetOptionMenu($rootID, $viewType = 'info', $rootModuleID = 0, $returnType = 'html')
+	public function TreeAjaxGetOptionMenu($rootID, $viewType = 'info', $rootModuleID = 0, $returnType = 'html')
     {
 
         $this->view->productModules = $this->info->getOptionMenu($rootID, 'info');

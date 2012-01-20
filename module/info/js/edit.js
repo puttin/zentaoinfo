@@ -27,6 +27,6 @@ function loadAll(libID)
  */
 function loadModuleMenu(libID)
 {
-    link = createLink('info', 'ajaxGetOptionMenu', 'libID=' + libID);
+    link = createLink('info', 'TreeAjaxGetOptionMenu', 'libID=' + libID);
     $('#moduleIdBox').load(link);
 }

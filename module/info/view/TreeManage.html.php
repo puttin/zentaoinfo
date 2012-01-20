@@ -3,7 +3,7 @@
 <table class='cont-lt5'>
   <tr valign='top'>
     <td class='side'>
-      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'updateOrder', "root={$root->id}&viewType=$viewType");?>'>
+      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'TreeUpdateOrder', "root={$root->id}&viewType=$viewType");?>'>
         <table class='table-1'>
           <caption><?php echo $header->title;?></caption>
           <tr>
@@ -19,7 +19,7 @@
     </td>
     <td class='divider'></td>
     <td>
-      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'manageChild', "root={$root->id}");?>'>
+      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'TreeManageChild', "root={$root->id}");?>'>
         <table align='center' class='table-1'>
           <caption><?php echo $lang->tree->manageChild;?></caption>
           <tr>
