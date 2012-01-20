@@ -169,12 +169,12 @@ class asset extends control{
 		$this->view->param       = $param;
 		$this->view->orderBy     = $orderBy;
 		$this->view->customed    = $customed;
+		$this->view->type        = 'asset';
 		$this->view->customFields= explode(',', str_replace(' ', '', trim($customFields)));
 		$this->display();
 	}
 	public function view($assetID)
 	{
-		/* Judge bug exits or not. */
 		$asset = $this->asset->getAssetById($assetID);
 		if(!$asset) die(js::error($this->lang->notFound) . js::locate('back'));
 
@@ -192,9 +192,10 @@ class asset extends control{
 		/* Assign. */
 		$this->view->modulePath  = $this->info->getParents($asset->module);
 		$this->view->asset       = $asset;
-		$this->view->moduleID     = $asset->module;
-		$this->view->libID     = $libID;
+		$this->view->moduleID    = $asset->module;
+		$this->view->libID       = $libID;
 		$this->view->libName     = $libName;
+		$this->view->type        = 'asset';
 		$this->view->users       = $this->user->getPairs('noletter');
 		$this->view->actions     = $this->action->getList('asset', $assetID);
 
@@ -248,7 +249,8 @@ class asset extends control{
 		$lend           = '';
 		$lenddate       = '0000-00-00';
 		$returndate     = '0000-00-00';
-		$assetcomment        = '';
+		$assetcomment   = '';
+		$use            = '';
 		
 		/* Parse the extras. */
 		$extras = str_replace(array(',', ' '), array('&', ''), $extras);
@@ -286,7 +288,8 @@ class asset extends control{
 			$lend           = $asset->lend;
 			$lenddate       = $asset->lenddate;
 			$returndate     = $asset->returndate;
-			$assetcomment        = $asset->assetcomment;
+			$assetcomment   = $asset->assetcomment;
+			$use            = $asset->use;
 		}
 		
 		/* Get the modules. */
@@ -301,6 +304,7 @@ class asset extends control{
 		$this->view->libs             = $this->info->getLibPairs($params = 'nodeleted','asset');
 		$this->view->moduleOptionMenu = $moduleOptionMenu;
 		$this->view->moduleID         = $moduleID;
+		$this->view->type             = 'asset';
 		
 		$this->view->hostname         = $hostname;
 		$this->view->address          = $address;
@@ -329,7 +333,8 @@ class asset extends control{
 		$this->view->lend             = $lend;
 		$this->view->lenddate         = $lenddate;
 		$this->view->returndate       = $returndate;
-		$this->view->assetcomment          = $assetcomment;
+		$this->view->assetcomment     = $assetcomment;
+		$this->view->use              = $use;
 
 		$this->display();
 	}
@@ -363,13 +368,14 @@ class asset extends control{
 		$this->view->position[]    = $this->lang->asset->edit;
 
 		/* Assign. */
-		$this->view->asset              = $asset;
-		$this->view->libID        = $libID;
+		$this->view->asset            = $asset;
+		$this->view->libID            = $libID;
 		$this->view->moduleOptionMenu = $this->info->getOptionMenu($libID,'asset', $startModuleID = 0);
 		$this->view->currentModuleID  = $currentModuleID;
 		$this->view->libs             = $this->info->getLibPairs('all','asset');
 		$this->view->users            = $this->user->getPairs('noclosed,nodeleted');
 		$this->view->actions          = $this->action->getList('asset', $assetID);
+		$this->view->type             = 'asset';
 
 		$this->display();
 	}
@@ -440,8 +446,8 @@ class asset extends control{
 			{
 				if($this->post->fileType == 'csv')
 				{
-					$asset->content = htmlspecialchars_decode($asset->hostname);
-					$asset->content = str_replace('"', '""', $asset->hostname);
+					$asset->hostname = htmlspecialchars_decode($asset->hostname);
+					$asset->hostname = str_replace('"', '""', $asset->hostname);
 				}
 
 				/* fill some field with useful value. */

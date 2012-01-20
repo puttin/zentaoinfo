@@ -4,6 +4,7 @@
 <script language='Javascript'>
 var browseType = '<?php echo $browseType;?>';
 var moduleID   = '<?php echo $moduleID;?>';
+var customed   = <?php echo (int)$customed;?>;
 </script>
 
 <div id='featurebar'>
@@ -21,7 +22,7 @@ var moduleID   = '<?php echo $moduleID;?>';
 	</div>
 	<div class='f-right'>
 	<?php common::printLink('info', 'export', "libID=$libID&orderBy="."Stickie_desc,"."$orderBy", $lang->export, '', 'class="export"'); ?>
-	<?php common::printLink('info', 'customFields', '', $lang->asset->customFields, '', "class='iframe'"); ?>
+	<?php common::printLink('info', 'customFields', '', $lang->info->customFields, '', "class='iframe'"); ?>
 	<?php common::printLink('info', 'create', "libID=$libID&moduleID=$moduleID", $lang->info->create); ?>
 	</div>
 </div>
@@ -34,7 +35,7 @@ var moduleID   = '<?php echo $moduleID;?>';
 			<div class='box-content'>
 			<?php echo $moduleTree;?>
 			<div class='a-right'>
-				<?php common::printLink('info', 'TreeManage', "rootID=$libID", $lang->tree->manage);?>
+				<?php common::printLink('info', 'treemanage', "rootID=$libID", $lang->tree->manage);?>
 			</div>
 			</div>
 		</td>

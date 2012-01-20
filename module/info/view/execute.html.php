@@ -14,7 +14,7 @@
     else
     {
         echo js::refresh('info');
-        echo html::linkButton($lang->info->upgradeTohome, 'info');
+        echo "<p class='a-center'>" . html::commonButton($lang->info->upgradeTohome, 'onclick=parent.location.href="' . inlink('browse') . '"') . '</p>';
     }
     ?>
     </td>

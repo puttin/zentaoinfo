@@ -8,7 +8,6 @@ class info extends control
 		$this->loadModel('tree');
 		$this->loadModel('user');
 		$this->loadModel('action');
-		$this->app->loadLang('asset',$exit = false);
 		$this->infolibs = $this->info->getLibs();
 	}
 	public function index()
@@ -179,6 +178,7 @@ class info extends control
 		$this->view->param       = $param;
 		$this->view->orderBy     = $orderBy;
 		$this->view->customed    = $customed;
+		$this->view->type        = 'info';
 		$this->view->customFields= explode(',', str_replace(' ', '', trim($customFields)));
 		$this->display();
 	}
@@ -217,6 +217,7 @@ class info extends control
 		$this->view->libs             = $this->info->getLibPairs($params = 'nodeleted');
 		$this->view->moduleOptionMenu = $moduleOptionMenu;
 		$this->view->moduleID         = $moduleID;
+		$this->view->type        = 'info';
 
 		$this->display();
 	}
@@ -243,7 +244,6 @@ class info extends control
 			die(js::locate($this->createLink('info', 'view', "infoID=$infoID"), 'parent'));
 		}
 
-		/* Get doc and set menu. */
 		$info = $this->info->getInfoById($infoID);
 		$libID = $info->lib;
 		$this->info->setMenu($this->infolibs, $libID);
@@ -259,6 +259,7 @@ class info extends control
 		$this->view->libs             = $this->info->getLibPairs();
 		$this->view->users            = $this->user->getPairs('noclosed,nodeleted');
 		$this->view->moduleOptionMenu = $moduleOptionMenu;
+		$this->view->type        = 'info';
 		$this->display();
 	}
 	public function delete($infoID, $confirm = 'no')
@@ -292,15 +293,17 @@ class info extends control
 
 		/* Assign. */
 		$this->view->modulePath  = $this->info->getParents($info->module);
-		$this->view->info         = $info;
-		$this->view->libName = $libName;
+		$this->view->info        = $info;
+		$this->view->libName     = $libName;
 		$this->view->users       = $this->user->getPairs('noletter');
 		$this->view->actions     = $this->action->getList('info', $infoID);
+		$this->view->type        = 'info';
 
 		$this->display();
 	}
 	public function createLib($type='info')
 	{
+		$this->app->loadLang($type,$exit = false);
 		if(!empty($_POST))
 		{
 			$libID = $this->info->createLib($type);
@@ -319,6 +322,7 @@ class info extends control
 	}
 	public function editLib($libID,$type='info')
 	{
+		$this->app->loadLang($type,$exit = false);
 		if(!empty($_POST))
 		{
 			$changes = $this->info->updateLib($libID,$type); 
@@ -344,6 +348,7 @@ class info extends control
 	}
 	public function deleteLib($libID,$type='info',$confirm = 'no')
 	{
+		$this->app->loadLang($type,$exit = false);
 		if($libID=='default')
 		{
 			$libID=$this->info->getDefaultLibId($type);
@@ -360,6 +365,7 @@ class info extends control
 	}
 	public function TreeManage($rootID, $currentModuleID = 0,$type='info')
 	{
+		$this->app->loadLang($type,$exit = false);
 		$lib = $this->loadModel('info')->getLibById($rootID);
 		$this->view->root = $lib;
 		$this->info->setMenu($this->info->getLibs($type), $rootID, $type);
@@ -378,11 +384,12 @@ class info extends control
 		$this->view->sons            = $this->info->getSons($rootID, $currentModuleID, $type);
 		$this->view->currentModuleID = $currentModuleID;
 		$this->view->parentModules   = $parentModules;
-		$this->view->type = $type;
+		$this->view->type            = $type;
 		$this->display();
 	}
 	public function TreeEdit($moduleID,$type='info')
 	{
+		$this->app->loadLang($type,$exit = false);
 		if(!empty($_POST))
 		{
 			$this->info->updateTree($moduleID);

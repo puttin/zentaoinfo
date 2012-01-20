@@ -1,4 +1,4 @@
 function setComment()
 {
-	$('#comment').toggle();
+	$('#comment').toggle("slow");
 }

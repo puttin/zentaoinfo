@@ -12,7 +12,7 @@ $lang->asset->view					= 'View Asset';
 $lang->asset->delete				= 'Delete Asset';
 
 /* condition*/
-$lang->asset->moduleInfos			= 'ByModule';
+$lang->asset->bymodule				= 'ByModule';
 $lang->asset->allInfos				= 'All Asset';
 $lang->asset->myduty				= 'MyDuty';
 $lang->asset->lendtome				= 'LendToMe';
@@ -55,7 +55,8 @@ $lang->asset->registdate			= 'Regist Date';
 $lang->asset->lend					= 'Lend';
 $lang->asset->lenddate				= 'Lend Date';
 $lang->asset->returndate			= 'Return Date';
-$lang->asset->comment				= 'Comment';
+$lang->asset->assetcomment				= 'Comment';
+$lang->asset->use					= 'Use';
 
 $lang->asset->libName				= 'Asset Library';
 $lang->asset->createLib				= 'Create Asset Library';
@@ -88,11 +89,12 @@ $lang->asset->lblAllFields			= 'All Fields';
 $lang->asset->lblCustomFields		= 'Custom Fields';
 
 /* list*/
-$lang->asset->statusList[0]			='Normal';
-$lang->asset->statusList[1]			='Shutdown';
-$lang->asset->statusList[2]			='Breakdown';
-$lang->asset->statusList[3]			='Repair';
-$lang->asset->statusList[4]			='Lend';
+$lang->asset->statusList[0]			='';
+$lang->asset->statusList[1]			='Normal';
+$lang->asset->statusList[2]			='Shutdown';
+$lang->asset->statusList[3]			='Breakdown';
+$lang->asset->statusList[4]			='Repair';
+$lang->asset->statusList[5]			='Lend';
 
 $lang->asset->osList['']			= '';
 $lang->asset->osList['all']			= 'All';
@@ -105,7 +107,7 @@ $lang->asset->osList['win2003']		= 'Windows 2003';
 $lang->asset->osList['win2008']		= 'Windows 2008';
 $lang->asset->osList['winnt']		= 'Windows NT';
 $lang->asset->osList['win98']		= 'Windows 98';
-$lang->asset->osList['adriod']		= 'Andriod';
+$lang->asset->osList['adroid']		= 'Android';
 $lang->asset->osList['ios']			= 'IOS';
 $lang->asset->osList['wp7']			= 'WP7';
 $lang->asset->osList['symbian']		= 'Symbian';
@@ -113,4 +115,9 @@ $lang->asset->osList['linux']		= 'Linux';
 $lang->asset->osList['freebsd']		= 'FreeBSD';
 $lang->asset->osList['mac']			= 'Mac OS';
 $lang->asset->osList['unix']		= 'Unix';
+$lang->asset->osList['aix5']		= 'AIX5';
+$lang->asset->osList['aix6']		= 'AIX6';
+$lang->asset->osList['hpux23']		= 'HPUX11.23';
+$lang->asset->osList['hpux31']		= 'HPUX11.31';
+$lang->asset->osList['solaris']		= 'Solaris';
 $lang->asset->osList['others']		= 'Others';

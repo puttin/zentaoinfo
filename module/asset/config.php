@@ -9,15 +9,15 @@ $config->asset->list->exportFields = 'id, lib, module, hostname, address, extend
 									 position, devicenumber, rootusername, rootpassword,
 									 codeversion, name, serial, model, cpu, memory, disk,
 									 graphics, price, netvalue, code, from, registdate,
-									 lend, lenddate, returndate,assetcomment,
+									 lend, lenddate, returndate,assetcomment,use,
 									 createdBy ,createdDate, lastEditedBy, lastEditedDate, editedCount';
 $config->asset->list->allFields = 'id, lib, module, hostname, address, extendaddress, os, username, password, status, duty,
 								 position, devicenumber, rootusername, rootpassword,
 								 codeversion, name, serial, model, cpu, memory, disk,
 								 graphics, price, netvalue, code, from, registdate,
-								 lend, lenddate, returndate,assetcomment,
+								 lend, lenddate, returndate,assetcomment,use,
 								 createdBy ,createdDate, lastEditedBy, lastEditedDate, editedCount';
-$config->asset->list->defaultFields = 'id,hostname,address,username,password,status,duty,codeversion,module';
+$config->asset->list->defaultFields = 'id,hostname,address,username,password,status,duty,codeversion,module,use';
 
 $config->asset->search['module']                   = 'asset';
 $config->asset->search['fields']['hostname']       = $lang->asset->hostname;
@@ -56,6 +56,8 @@ $config->asset->search['fields']['createdDate']    = $lang->asset->createdDate;
 $config->asset->search['fields']['lastEditedBy']   = $lang->asset->lastEditedBy;
 $config->asset->search['fields']['lastEditedDate'] = $lang->asset->lastEditedDate;
 $config->asset->search['fields']['editedCount']    = $lang->asset->editedCount;
+$config->asset->search['fields']['assetcomment']   = $lang->asset->assetcomment;
+$config->asset->search['fields']['use']            = $lang->asset->use;
 
 $config->asset->search['params']['hostname']       = array('operator' => 'include',       'control' => 'input', 'values' => '');
 $config->asset->search['params']['os']             = array('operator' => '=',       'control' => 'select', 'values' => $lang->asset->osList);
@@ -92,3 +94,5 @@ $config->asset->search['params']['createdDate']    = array('operator' => '>=',  
 $config->asset->search['params']['lastEditedBy']   = array('operator' => '=',       'control' => 'select', 'values' => 'users');
 $config->asset->search['params']['lastEditedDate'] = array('operator' => '>=',      'control' => 'input',  'values' => '');
 $config->asset->search['params']['editedCount']    = array('operator' => '=',       'control' => 'input', 'values' => '');
+$config->asset->search['params']['assetcomment']   = array('operator' => 'include',       'control' => 'input', 'values' => '');
+$config->asset->search['params']['use']            = array('operator' => 'include',       'control' => 'input', 'values' => '');

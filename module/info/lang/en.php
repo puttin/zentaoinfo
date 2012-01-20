@@ -96,6 +96,7 @@ $lang->info->upgradeToVersion     = 'To version';
 
 $lang->info->upgradeFromVersions['0_1']   = '0.1 or 0.1.1';
 $lang->info->upgradeFromVersions['0_2']   = '0.2';
+$lang->info->upgradeFromVersions['0_3']   = '0.3';
 
 /* mail to*/
 $lang->info->mailModify ='Modify';

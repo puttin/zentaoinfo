@@ -174,10 +174,14 @@
 		</td>
 	</tr>
 </table>
-<?php if($asset->assetcomment):?>
+<?php if($asset->assetcomment or $asset->use):?>
 <fieldset>
 	<legend><?php echo $lang->asset->legendCommentInfo;?></legend>
 		<table class='table-3 a-left fixed'>
+			<tr>
+				<th class='rowhead w-p20'><?php echo $lang->asset->use;?></th>
+				<td><?php if($asset->use) echo $asset->use;?></td>
+			</tr>
 			<tr>
 				<th class='rowhead w-p20'><?php echo $lang->asset->lastEditedBy;?></th>
 				<td><?php if($asset->lastEditedBy) echo $users[$asset->lastEditedBy] . $lang->at . $asset->lastEditedDate?></td>

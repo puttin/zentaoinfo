@@ -59,15 +59,15 @@ userList = "<?php echo join(',', array_keys($users));?>".split(',');
 		<tr>
 			<th class='rowhead'><?php echo $lang->info->keywords;?></th>
 			<td><?php echo html::input('keywords', '', "class='text-1'");?></td>
-		</tr>    
+		</tr>
 		<tr>
 			<th class='rowhead'><?php echo $lang->info->digest;?></th>
 			<td><?php echo html::textarea('digest', '', "class='text-1' rows=3");?></td>
-		</tr>    
+		</tr>
 		<tr id='fileBox'>
 			<th class='rowhead'><?php echo $lang->info->files;?></th>
 			<td><?php echo $this->fetch('file', 'buildform', 'fileCount=2');?></td>
-		</tr>    
+		</tr>
 		<tr>
 			<td colspan='2' class='a-center'><?php echo html::submitButton() . html::resetButton();?></td>
 		</tr>

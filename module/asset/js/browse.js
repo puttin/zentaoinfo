@@ -5,7 +5,7 @@ function browseByModule()
 	$('.divider').removeClass('hidden');
 	$('#bymoduleTab').addClass('active');
     $('#lendtomeTab').removeClass('active');
-    $('#mudutyTab').removeClass('active');
+    $('#mydutyTab').removeClass('active');
 	$('#allTab').removeClass('active');
 	$('#bysearchTab').removeClass('active');
 	$('#querybox').addClass('hidden');

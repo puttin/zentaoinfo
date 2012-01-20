@@ -58,7 +58,7 @@ class assetModel extends model{
 			->setIF($result1,'extendaddress','Conflict!')
 			->setIF($result2,'address','Conflict!')
 			->get();
-		$condition = "module = '$asset->module'";
+		$condition = "`lib` = '$asset->lib' AND module = '$asset->module'";
 		$conditionaddress = $condition." and address != 'IP Format Error' and address != 'Conflict!'";
 		$conditionextaddress = $condition." and extendaddress != 'IP Format Error' and extendaddress != 'Conflict!'";
 		$this->dao->insert(TABLE_INFOASSET)
@@ -118,7 +118,7 @@ class assetModel extends model{
 			->setIF($result1,'extendaddress','Conflict!')
 			->setIF($result2,'address','Conflict!')
 			->get();
-		$condition = "module = '$asset->module' and id != '$assetID'";
+		$condition = "`lib` = '$asset->lib' AND module = '$asset->module' and id != '$assetID'";
 		$conditionaddress = $condition." and address != 'IP Format Error' and address != 'Conflict!'";
 		$conditionextaddress = $condition." and extendaddress != 'IP Format Error' and extendaddress != 'Conflict!'";
 		$this->dao->update(TABLE_INFOASSET)->data($asset)

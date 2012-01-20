@@ -1,7 +1,10 @@
-<?php
+﻿<?php
 class infoModel extends model
 {
     static $errors = array();
+    public function addViewedCount($id,$table){
+		$this->dao->update($table)->set('`viewedCount` = `viewedCount` + 1')->where('id')->eq($id)->exec();
+	}
 	private function createInfoLink($module)
 	{
 		$linkHtml = html::a(helper::createLink('info', 'browse', "libID={$module->root}&&moduleID={$module->id}"), $module->name, '_self', "id='module{$module->id}'");
@@ -58,7 +61,7 @@ class infoModel extends model
 		$this->dao->insert(TABLE_INFOLIB)
 			->data($lib)
 			->autoCheck()
-			->batchCheck('name', 'notempty')
+			->batchCheck($this->config->info->createLib->requiredFields, 'notempty')
 			->check('name', 'unique',$condition)
 			->exec();
 		return $this->dao->lastInsertID();
@@ -333,7 +336,7 @@ class infoModel extends model
 		$this->dao->update(TABLE_INFOLIB)
 			->data($lib)
 			->autoCheck()
-			->batchCheck('name', 'notempty')
+			->batchCheck($this->config->info->editLib->requiredFields, 'notempty')
 			->check('name', 'unique', $condition)
 			->where('id')->eq($libID)
 			->exec();
@@ -482,6 +485,32 @@ class infoModel extends model
 			$this->dao->update(TABLE_INFOMODULE)->data($module)->where('id')->eq($module->id)->limit(1)->exec();
 		}
 	}
+	public function createRemind($actionID,$account,$type)
+	{
+		$remind->actionID=$actionID;
+		$remind->account=$account;
+		$remind->type=$type;
+		$this->dao->insert(TABLE_INFOREMIND)
+			->data($remind)
+			->autoCheck()
+			->batchCheck('actionID,account,type', 'notempty')
+			->exec();
+		if(!dao::isError())
+		{
+			$remindID = $this->dao->lastInsertID();
+			return $remindID;
+		}
+		return false;
+	}
+	public function deleteRemind($actionID)
+	{
+		$this->dao->delete()->from(TABLE_INFOREMIND)->where('actionID')->eq($actionID)->exec();
+		if(!dao::isError())
+		{
+			return true;
+		}
+		return false;
+	}
 	public function execute($fromVersion)
 	{
 		if($fromVersion == '0_1'){
@@ -490,6 +519,9 @@ class infoModel extends model
 		}
 		elseif ($fromVersion == '0_2'){
 			$this->upgradeFrom0_2To0_3();
+		}
+		elseif ($fromVersion == '0_3'){
+			$this->upgradeFrom0_3To0_3_1();
 		}
 	}
 	private function execSQL($sqlFile)
@@ -541,6 +573,11 @@ class infoModel extends model
 	{
 		$this->execSQL($this->getUpgradeFile('0.3'));
 		$this->setVersion('0.3');
+	}
+	private function upgradeFrom0_3To0_3_1()
+	{
+		$this->execSQL($this->getUpgradeFile('0.3.1'));
+		$this->setVersion('0.3.1');
 	}
 	/**
 	 * Judge any error occers.

@@ -4,13 +4,14 @@
 <script language='Javascript'>
 var browseType = '<?php echo $browseType;?>';
 var moduleID   = '<?php echo $moduleID;?>';
+var customed   = <?php echo (int)$customed;?>;
 </script>
 
 <div id='featurebar'>
 	<div class='f-left'>
 		<?php
 			if ($libID){
-				echo "<span id='bymoduleTab' onclick=\"browseByModule('$browseType')\"><a href='#'>" . $lang->asset->moduleInfos . "</a></span> ";
+				echo "<span id='bymoduleTab' onclick=\"browseByModule('$browseType')\"><a href='#'>" . $lang->asset->bymodule . "</a></span> ";
 				echo "<span id='mydutyTab'>". html::a($this->createLink('asset', 'browse', "libID=$libID&moduleID=$moduleID&browseType=myduty&param=0"),$lang->asset->myduty). "</span>";
 				echo "<span id='lendtomeTab'>" . html::a($this->createLink('asset', 'browse', "libID=$libID&moduleID=$moduleID&browseType=lendtome&param=0"), $lang->asset->lendtome) . "</span>";
 			}
@@ -33,7 +34,7 @@ var moduleID   = '<?php echo $moduleID;?>';
 			<div class='box-content'>
 			<?php echo $moduleTree;?>
 			<div class='a-right'>
-				<?php if(common::hasPriv('info', 'TreeManage')) common::printLink('info', 'TreeManage', "rootID=$libID&module=0&type=asset", $lang->tree->manage);?>
+				<?php if(common::hasPriv('info', 'TreeManage')) common::printLink('info', 'treemanage', "rootID=$libID&module=0&type=asset", $lang->tree->manage);?>
 			</div>
 			</div>
 		</td>
@@ -55,6 +56,7 @@ var moduleID   = '<?php echo $moduleID;?>';
 					<th class='w-user'>  <?php common::printOrderLink('duty', $orderBy, $vars, $lang->asset->duty);?></th>
 					<th class='w-60px'>  <?php common::printOrderLink('codeversion', $orderBy, $vars, $lang->asset->codeversion);?></th>
 					<th class='w-60px'>  <?php common::printOrderLink('module', $orderBy, $vars, $lang->asset->module);?></th>
+					<th class='w-60px'>  <?php common::printOrderLink('use', $orderBy, $vars, $lang->asset->use);?></th>
 					<?php endif;?>
 				</tr>
 				</thead>
@@ -70,17 +72,18 @@ var moduleID   = '<?php echo $moduleID;?>';
 					<td><?php echo $asset->password;?></td>
 					
 					<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
-					<td><?php echo $lang->asset->statusList[$asset->status]?></td>
+					<td<?php echo ' class="'.'status'.$asset->status.'"'?>><?php echo $lang->asset->statusList[$asset->status]?></td>
 					<td <?php echo $classduty;?>><?php echo $users[$asset->duty];?></td>
 					<td><?php echo $asset->codeversion;?></td>
 					<td><?php echo $asset->module;?></td>
+					<td><?php echo $asset->use;?></td>
 					<?php endif;?>
 				</tr>
 			<?php endforeach;?>
 			</tbody>
 			<tfoot>
 				<tr>
-					<?php $columns = $this->cookie->windowWidth > $this->config->wideSize ? 9 : 5;?>
+					<?php $columns = $this->cookie->windowWidth > $this->config->wideSize ? 10 : 5;?>
 					<td colspan='<?php echo $columns;?>'>
 						<div class='f-left'>
 						</div>

@@ -73,9 +73,17 @@
 							echo substr($asset->$fieldName, 5, 11);
 							echo "</td>";
 						}
-						elseif(preg_match('/^(pri|status|os)$/i', $fieldName))
+						elseif(preg_match('/^os$/i', $fieldName))
 						{
 							echo "<td>";
+							$key = $fieldName . 'List';
+							$list = $lang->asset->$key;
+							echo $list[$asset->$fieldName];
+							echo "</td>";
+						}
+						elseif(preg_match('/^status$/i', $fieldName))
+						{
+							echo '<td class="'.'status'.$asset->status.'">';
 							$key = $fieldName . 'List';
 							$list = $lang->asset->$key;
 							echo $list[$asset->$fieldName];

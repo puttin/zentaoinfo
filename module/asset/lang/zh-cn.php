@@ -12,7 +12,7 @@ $lang->asset->view					= '资产详情';
 $lang->asset->delete				= '删除资产';
 
 /* 查询条件列表。*/
-$lang->asset->moduleInfos			= '按模块浏览';
+$lang->asset->bymodule				= '按模块浏览';
 $lang->asset->allInfos				= '全部资产';
 $lang->asset->myduty				= '责任人是我';
 $lang->asset->lendtome				= '借给我';
@@ -55,7 +55,8 @@ $lang->asset->registdate			= '登记日期';
 $lang->asset->lend					= '借用者';
 $lang->asset->lenddate				= '借用日期';
 $lang->asset->returndate			= '归还日期';
-$lang->asset->comment				= '备注';
+$lang->asset->assetcomment				= '备注';
+$lang->asset->use					= '用途';
 
 $lang->asset->libName				= '资产库名称';
 $lang->asset->createLib				= '创建资产库';
@@ -88,11 +89,12 @@ $lang->asset->lblAllFields			= '所有字段';
 $lang->asset->lblCustomFields		= '自定义字段';
 
 /* 各个字段取值列表。*/
-$lang->asset->statusList[0]			='正常';
-$lang->asset->statusList[1]			='关机';
-$lang->asset->statusList[2]			='故障';
-$lang->asset->statusList[3]			='维修';
-$lang->asset->statusList[4]			='借出';
+$lang->asset->statusList[0]			='';
+$lang->asset->statusList[1]			='正常';
+$lang->asset->statusList[2]			='关机';
+$lang->asset->statusList[3]			='故障';
+$lang->asset->statusList[4]			='维修';
+$lang->asset->statusList[5]			='借出';
 
 $lang->asset->osList['']			= '';
 $lang->asset->osList['all']			= '全部';
@@ -105,7 +107,7 @@ $lang->asset->osList['win2003']		= 'Windows 2003';
 $lang->asset->osList['win2008']		= 'Windows 2008';
 $lang->asset->osList['winnt']		= 'Windows NT';
 $lang->asset->osList['win98']		= 'Windows 98';
-$lang->asset->osList['adriod']		= 'Andriod';
+$lang->asset->osList['adroid']		= 'Android';
 $lang->asset->osList['ios']			= 'IOS';
 $lang->asset->osList['wp7']			= 'WP7';
 $lang->asset->osList['symbian']		= 'Symbian';
@@ -113,4 +115,9 @@ $lang->asset->osList['linux']		= 'Linux';
 $lang->asset->osList['freebsd']		= 'FreeBSD';
 $lang->asset->osList['mac']			= 'Mac OS';
 $lang->asset->osList['unix']		= 'Unix';
+$lang->asset->osList['aix5']		= 'AIX5';
+$lang->asset->osList['aix6']		= 'AIX6';
+$lang->asset->osList['hpux23']		= 'HPUX11.23';
+$lang->asset->osList['hpux31']		= 'HPUX11.31';
+$lang->asset->osList['solaris']		= 'Solaris';
 $lang->asset->osList['others']		= '其他';

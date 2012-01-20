@@ -159,6 +159,12 @@ confirmChangeLib   = '<?php echo $lang->asset->confirmChangeLib;?>';
 	</table>
 	<fieldset>
 		<legend><?php echo $lang->asset->legendCommentInfo;?></legend>
+		<table class='table-3 a-left fixed'>
+			<tr>
+				<th class='rowhead w-p20'><?php echo $lang->asset->use;?></th>
+				<td> <?php echo html::input('use', $asset->use, 'class=text-3');?></td>
+			</tr>
+		</table>
 		<?php echo html::textarea('assetcomment', $asset->assetcomment, "class='area-1'");?>
 	</fieldset>
 	<?php include '../../common/view/action.html.php';?>

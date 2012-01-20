@@ -96,6 +96,7 @@ $lang->info->upgradeToVersion     = '升级到';
 
 $lang->info->upgradeFromVersions['0_1']   = '0.1 或 0.1.1';
 $lang->info->upgradeFromVersions['0_2']   = '0.2';
+$lang->info->upgradeFromVersions['0_3']   = '0.3';
 
 /* 邮件抄送。*/
 $lang->info->mailModify ='此次变化';
