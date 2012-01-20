@@ -1,6 +1,7 @@
 <?php
 class infoModel extends model
 {
+    static $errors = array();
 	private function createInfoLink($module)
 	{
 		$linkHtml = html::a(helper::createLink('info', 'browse', "libID={$module->root}&&moduleID={$module->id}"), $module->name, '_self', "id='module{$module->id}'");
@@ -23,7 +24,9 @@ class infoModel extends model
 		$info = fixer::input('post')
 			->add('createdBy', $this->app->user->account)
 			->add('createdDate', $now)
+			->add('lastEditedDate', $now)
 			->setDefault('module', 0)
+			->setDefault('deadline','0000-00-00')
 			->specialChars('title, digest, keywords')
 			->cleanInt('module')
 			->remove('files, labels')
@@ -82,7 +85,7 @@ class infoModel extends model
 		$info->content = $this->loadModel('file')->setImgSize($info->content);
 		foreach($info as $key => $value) if(strpos($key, 'Date') !== false and !(int)substr($value, 0, 4)) $info->$key = '';
 		$info->files = $this->loadModel('file')->getByObject('info', $infoID);
-		return $info;
+        return $this->processInfo($info);
 	}
 	public function getLibById($libID)
 	{
@@ -100,10 +103,13 @@ class infoModel extends model
 	}
 	public function getInfos($libID, $module, $orderBy, $pager)
 	{
+        $yesterday = date("Y-m-d", strtotime("-1 day"));
 		return $this->dao->select('*')->from(TABLE_INFO)
 			->where('deleted')->eq(0)
 			->beginIF(is_numeric($libID))->andWhere('lib')->eq($libID)->fi()
 			->beginIF($module)->andWhere('module')->in($module)->fi()
+			->andWhere('(`deadline` > "'.$yesterday.'" OR `deadline` IS NULL)')
+			->andWhere('Stickie')->ne(2)
 			->orderBy($orderBy)
 			->page($pager)
 			->fetchAll();
@@ -126,21 +132,21 @@ class infoModel extends model
 			->fetchAll();
 	}
 	public function getLibPairs($param = 'all')
-    {
-        $libs = array();
-        $datas = $this->dao->select('id, name, deleted')
-            ->from(TABLE_INFOLIB)
-            ->orderBy('id desc')
-            ->fetchAll();
+	{
+		$libs = array();
+		$datas = $this->dao->select('id, name, deleted')
+			->from(TABLE_INFOLIB)
+			->orderBy('id desc')
+			->fetchAll();
 
-        foreach($datas as $data)
-        {
-            if($param == 'nodeleted' and $data->deleted) continue;
-            $libs[$data->id] = $data->name;
-        }
-        //$libs = array('' => '') +  $libs;
-        return $libs;
-    }
+		foreach($datas as $data)
+		{
+			if($param == 'nodeleted' and $data->deleted) continue;
+			$libs[$data->id] = $data->name;
+		}
+		//$libs = array('' => '') +  $libs;
+		return $libs;
+	}
 	public function getTreeMenu($rootID, $type = 'root', $startModule = 0, $userFunc, $extra = '')
 	{
 		$treeMenu = array();
@@ -190,7 +196,7 @@ class infoModel extends model
 			}
 			$moduleName = rtrim($moduleName, '/');
 			$moduleName .= "|$module->id\n";
-
+			
 			if(isset($treeMenu[$module->id]) and !empty($treeMenu[$module->id]))
 			{
 				if(isset($treeMenu[$module->parent]))
@@ -263,8 +269,10 @@ class infoModel extends model
 		$info = fixer::input('post')
 			->cleanInt('module')
 			->setDefault('module', 0)
+			->setDefault('deadline','0000-00-00')
 			->specialChars('title, digest, keywords')
 			->remove('comment,files, labels')
+			->removeIF(!common::hasPriv('info', 'HighlightAndStickie'),'stickie,highlight')
 			->add('lastEditedBy',$this->app->user->account)
 			->add('lastEditedDate',$now)
 			->get();
@@ -348,7 +356,6 @@ class infoModel extends model
 		$parentModule = $this->getModuleById($parentModuleID);
 		if($parentModule)
 		{
-			
 			$grade      = $parentModule->grade + 1;
 			$parentPath = $parentModule->path;
 		}
@@ -385,6 +392,32 @@ class infoModel extends model
 			}
 		}
 	}
+	private function processInfos($infos)
+    {
+        $today = helper::today();
+        foreach($infos as $info)
+        {
+            /* Delayed or not. */
+            if($info->deadline != '0000-00-00')
+            {
+                $delay = helper::diffDate($today, $info->deadline);
+                if($delay > 0) $info->delay = $delay;
+            }
+        }
+        return $infos;
+    }
+    private function processInfo($info)
+    {
+        $today = helper::today();
+       
+        /* Delayed or not?. */
+        if($info->deadline != '0000-00-00')
+        {
+            $delay = helper::diffDate($today, $info->deadline);
+        	if($delay > 0) $info->delay = $delay;            
+        } 
+        return $info;
+    }
 	public function fixModulePath()
 	{
 		/* Get the max grade. */
@@ -418,9 +451,118 @@ class infoModel extends model
 		/* Save modules to database. */
 		foreach($modules as $moduleID => $module)
 		{
-			$this->dao->update(TABLE_MODULE)->data($module)->where('id')->eq($module->id)->limit(1)->exec();
+			$this->dao->update(TABLE_INFOMODULE)->data($module)->where('id')->eq($module->id)->limit(1)->exec();
 		}
 	}
+	public function execute($fromVersion)
+	{
+		if($fromVersion == '0_1')
+		{
+			$this->upgradeFrom0_1To0_2();
+		}
+	}
+	private function execSQL($sqlFile)
+    {
+        $mysqlVersion = $this->loadModel('install')->getMysqlVersion();
+
+        /* Read the sql file to lines, remove the comment lines, then join theme by ';'. */
+        $sqls = explode("\n", file_get_contents($sqlFile));
+        foreach($sqls as $key => $line) 
+        {
+            $line       = trim($line);
+            $sqls[$key] = $line;
+            if(strpos($line, '--') !== false or empty($line)) unset($sqls[$key]);
+        }
+        $sqls = explode(';', join("\n", $sqls));
+
+        foreach($sqls as $sql)
+        {
+            $sql = trim($sql);
+            if(empty($sql)) continue;
+
+            if($mysqlVersion <= 4.1)
+            {
+                $sql = str_replace('DEFAULT CHARSET=utf8', '', $sql);
+                $sql = str_replace('CHARACTER SET utf8 COLLATE utf8_general_ci', '', $sql);
+            }
+
+            $sql = str_replace('zt_', $this->config->db->prefix, $sql);
+            try
+            {
+                $this->dbh->exec($sql);
+            }
+            catch (PDOException $e) 
+            {
+                self::$errors[] = $e->getMessage() . "<p>The sql is: $sql</p>";
+            }
+        }
+    }
+	private function getUpgradeFile($version)
+    {
+        return $this->app->getModuleExtPath('extension','info') . 'db' . $this->app->getPathFix() . 'update' . $version . '.sql';
+    }
+	private function upgradeFrom0_1To0_2()
+	{
+		$this->execSQL($this->getUpgradeFile('0.2'));
+	}
+	/**
+	 * Judge any error occers.
+	 * 
+	 * @access public
+	 * @return bool
+	 */
+	public function isError()
+	{
+		return !empty(self::$errors);
+	}
+
+	/**
+	 * Get errors during the upgrading.
+	 * 
+	 * @access public
+	 * @return array
+	 */
+	public function getError()
+	{
+		$errors = self::$errors;
+		self::$errors = array();
+		return $errors;
+	}
+	public function setVersion()
+    {
+        $item->company = 0;
+        $item->owner   = 'system';
+        $item->section = 'global';
+        $item->key     = 'infoplugin';
+        $item->value   =  $config->infoVersion;
+
+        $config = $this->dao->select('id, value')->from(TABLE_CONFIG)
+            ->where('company')->eq(0)
+            ->andWhere('owner')->eq('system')
+            ->andWhere('section')->eq('global')
+            ->andWhere('`key`')->eq('infoplugin')
+            ->fetch('', $autoComapny = false);
+        if(!$config)
+        {
+            $this->dao->insert(TABLE_CONFIG)->data($item)->exec($autoCompany = false);
+        }
+    }
+    public function getVersion()
+    {
+        $config = $this->dao->select('id, value')->from(TABLE_CONFIG)
+            ->where('company')->eq(0)
+            ->andWhere('owner')->eq('system')
+            ->andWhere('section')->eq('global')
+            ->andWhere('`key`')->eq('infoplugin')
+            ->fetch('', $autoComapny = false);
+        if(!$config)
+        {
+            return false;
+        }
+        else{
+        	return $config->value;
+        }
+    }
 //    public function getModuleInfos( $moduleIds = 0, $orderBy = 'id_desc', $pager = null)
 //    {
 //        return $this->dao->select('*')->from(TABLE_INFO)

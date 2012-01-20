@@ -1,4 +1,4 @@
-<?php include '../../common/view/header.html.php';?>
+<?php include './header.html.php';?>
 <?php include '../../common/view/treeview.html.php';?>
 <table class='cont-lt5'>
   <tr valign='top'>

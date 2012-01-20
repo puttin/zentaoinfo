@@ -1,7 +1,7 @@
 <?php include './header.html.php';?>
 <div id='titlebar'>
-  <div id='main' <?php if($info->deleted) echo "class='deleted'";?>>INFO #<?php echo $info->id . $lang->colon . $info->title;?></div>
-  <div>
+	<div id='main' <?php if($info->deleted) echo "class='deleted'";?>>INFO #<?php echo $info->id . $lang->colon . $info->title;?></div>
+	<div>
 	<?php
 	$browseLink    = $app->session->infoList != false ? $app->session->infoList : inlink('browse', "libID=$info->lib");
 	$params        = "infoID=$info->id";
@@ -14,11 +14,11 @@
 	}
 	echo html::a($browseLink, $lang->goback);
 	?>
-  </div>
+	</div>
 </div>
 
 <table class='cont-rt5'>
-  <tr valign='top'>
+	<tr valign='top'>
 	<td>
 		<?php if($info->digest){?>
 			<fieldset>
@@ -46,45 +46,58 @@
 	</td>
 	<td class='divider'></td>
 	<td class='side'>
-	  <fieldset>
+		<fieldset>
 		<legend><?php echo $lang->info->legendBasicInfo;?></legend>
 		<table class='table-1 a-left'>
-		<tr valign='middle'>
-			<th class='rowhead'><?php echo $lang->info->lib;?></th>
-			<td><?php if(!common::printLink('info', 'browse', "libID=$info->lib", $libName)) echo $libName;?>
-		</tr>
-		  <tr>
-			<th class='rowhead'><?php echo $lang->info->module;?></th>
-			<td> 
-			  <?php
-			  foreach($modulePath as $key => $module)
-			  {
-				  if(!common::printLink('info', 'browse', "libID=$info->lib&moduleID=$module->id", $module->name)) echo $module->name;
-				  if(isset($modulePath[$key + 1])) echo $lang->arrow;
-			  }
-			  ?>
+			<tr valign='middle'>
+				<th class='rowhead'><?php echo $lang->info->lib;?></th>
+				<td><?php if(!common::printLink('info', 'browse', "libID=$info->lib", $libName)) echo $libName;?>
+			</tr>
+			<tr>
+				<th class='rowhead'><?php echo $lang->info->module;?></th>
+				<td> 
+					<?php
+					foreach($modulePath as $key => $module)
+					{
+						if(!common::printLink('info', 'browse', "libID=$info->lib&moduleID=$module->id", $module->name)) echo $module->name;
+						if(isset($modulePath[$key + 1])) echo $lang->arrow;
+					}
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td class='rowhead'><?php echo $lang->info->editedCount;?></td>
+				<td><?php echo $info->editedCount;?></td>
+			</tr>
+			<tr>
+				<td class='rowhead w-p20'><?php echo $lang->info->mailto;?></td>
+				<td><?php $mailto = explode(',', str_replace(' ', '', $info->mailto)); foreach($mailto as $account) echo ' ' . $users[$account]; ?></td>
+			</tr>
+			<tr>
+			<th class='rowhead'><?php echo $lang->info->deadline;?></th>
+			<td>
+				<?php
+					echo $info->deadline;
+					if(isset($info->delay)) printf($lang->info->delayWarning, $info->delay);
+				?>
 			</td>
-		  </tr>
-		  <tr>
-			<td class='rowhead'><?php echo $lang->info->editedCount;?></td>
-			<td><?php echo $info->editedCount;?></td>
-		  </tr>
+		  </tr> 
 		</table>
-	  </fieldset>
-	  <fieldset>
+		</fieldset>
+		<fieldset>
 		<legend><?php echo $lang->info->legendLife;?></legend>
 		<table class='table-1 a-left fixed'>
-		  <tr>
+			<tr>
 			<th class='rowhead w-p20'><?php echo $lang->info->createdBy;?></th>
 			<td> <?php echo $users[$info->createdBy] . $lang->at . $info->createdDate;?></td>
-		  </tr>
-		  <tr>
+			</tr>
+			<tr>
 			<th class='rowhead'><?php echo $lang->info->lastEditedBy;?></th>
 			<td><?php if($info->lastEditedBy) echo $users[$info->lastEditedBy] . $lang->at . $info->lastEditedDate?></td>
-		  </tr>
+			</tr>
 		</table>
-	  </fieldset>
+		</fieldset>
 	</td>
-  </tr>
+	</tr>
 </table>
 <?php include './footer.html.php';?>

@@ -7,51 +7,60 @@ var moduleID   = '<?php echo $moduleID;?>';
 </script>
 
 <div id='featurebar'>
-  <div class='f-left'>
-	<?php if ($libID){
-		echo "<span id='bymoduleTab' onclick=\"browseByModule('$browseType')\"><a href='#'>" . $lang->info->moduleInfos . "</a></span> ";
-	}
-	echo "<span id='allTab'>". html::a($this->createLink('info', 'browse', "libID=0&moduleID=0&browseType=all"),$lang->info->allInfos). "</span>";
-	?>
-  </div>
-  <div class='f-right'>
+	<div class='f-left'>
+		<?php
+			if ($libID){
+				echo "<span id='bymoduleTab' onclick=\"browseByModule('$browseType')\"><a href='#'>" . $lang->info->moduleInfos . "</a></span> ";
+			}
+			echo "<span id='allTab'>". html::a($this->createLink('info', 'browse', "libID=$libID&moduleID=$moduleID&browseType=all"),$lang->info->allInfos). "</span>";
+		?>
+		<span id='bysearchTab'><a href='#'><?php echo $lang->info->searchInfo;?></a></span>
+	</div>
+	<div class='f-right'>
+	<?php common::printLink('info', 'export', "libID=$libID&orderBy="."Stickie_desc,"."$orderBy", $lang->export, '', 'class="export"'); ?>
 	<?php common::printLink('info', 'create', "libID=$libID&moduleID=$moduleID", $lang->info->create); ?>
-  </div>
+	</div>
 </div>
+<div id='querybox' class='<?php if($browseType !='bysearch') echo 'hidden';?>'><?php echo $searchForm;?></div>
 
-<table class='cont-lt1'>
+<table class='cont-lt2'>
 	<tr valign='top'>
 		<td class='side <?php echo $treeClass;?>' id='treebox'>
-		  <div class='box-title'><?php echo $lang->info->module;?></div>
-		  <div class='box-content'>
+			<div class='box-title'><?php echo $lang->info->module;?></div>
+			<div class='box-content'>
 			<?php echo $moduleTree;?>
 			<div class='a-right'>
-			  <?php if(common::hasPriv('info', 'TreeManage')) common::printLink('info', 'TreeManage', "rootID=$libID", $lang->tree->manage);?>
+				<?php if(common::hasPriv('info', 'TreeManage')) common::printLink('info', 'TreeManage', "rootID=$libID", $lang->tree->manage);?>
 			</div>
-		  </div>
+			</div>
 		</td>
 		<td class='divider <?php echo $treeClass;?>'></td>
 		<td>
-		   <?php $vars = "libID=$libID&moduleID=$moduleID&browseType=$browseType&param=$param&orderBy=%s&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}"; ?>
-		  <table class='table-1 fixed colored tablesorter datatable'>
+			 <?php $vars = "libID=$libID&moduleID=$moduleID&browseType=$browseType&param=$param&orderBy=%s&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}"; ?>
+			<table class='table-1 fixed colored tablesorter datatable'>
 			<thead>
 			<tr class='colhead'>
-			  <th class='w-id'>       <?php common::printOrderLink('id',$orderBy, $vars, $lang->idAB);?></th>
-
-			  <th><?php common::printOrderLink('title', $orderBy, $vars, $lang->info->title);?></th>
+				<th class='w-id'>     <?php common::printOrderLink('id',$orderBy, $vars, $lang->idAB);?></th>
+				
+				<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
+				<th class='w-pri'>  <?php common::printOrderLink('pri', $orderBy, $vars, $lang->priAB);?></th>
+				<?php endif;?>
+				
+				<th><?php common::printOrderLink('title', $orderBy, $vars, $lang->info->title);?></th>
 	
-			  <th class='w-user'><?php common::printOrderLink('createdBy',$orderBy, $vars, $lang->openedByAB);?></th>
+				<th class='w-user'><?php common::printOrderLink('createdBy',$orderBy, $vars, $lang->openedByAB);?></th>
 	
-			  <?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
-			  <th class='w-date'>  <?php common::printOrderLink('createdDate', $orderBy, $vars, $lang->info->createdDateAB);?></th>
-			  <?php endif;?>
-			  <th class='w-user'><?php common::printOrderLink('lastEditedBy',$orderBy, $vars, $lang->info->lastEditedBy);?></th>
+				<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
+				<th class='w-date'>  <?php common::printOrderLink('createdDate', $orderBy, $vars, $lang->info->createdDateAB);?></th>
+				<?php endif;?>
+				
+				<th class='w-user'><?php common::printOrderLink('lastEditedBy',$orderBy, $vars, $lang->info->lastEditedBy);?></th>
 	
-			  <?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
-			  <th class='w-date'>  <?php common::printOrderLink('lastEditedDate', $orderBy, $vars, $lang->info->lastEditedDate);?></th>
-			  <?php endif;?>
+				<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
+				<th class='w-date'>  <?php common::printOrderLink('lastEditedDate', $orderBy, $vars, $lang->info->lastEditedDate);?></th>
+				<?php endif;?>
 	
-			  <th class='w-140px {sorter:false}'><?php echo $lang->actions;?></th>
+				<th class='w-70px {sorter:false}'><?php echo $lang->actions;?></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -59,23 +68,53 @@ var moduleID   = '<?php echo $moduleID;?>';
 				<?php $infoLink = inlink('view', "infoID=$info->id");?>
 				<tr class='a-center'>
 					<td class='linkbox <?php echo $class;?>'><?php echo html::a($infoLink, sprintf('%03d', $info->id));?></td>
-					<td class='a-left nobr'><?php echo html::a($infoLink, $info->title);?></td>
+					
+					<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
+					<td><?php echo $lang->info->priList[$info->pri]?></td>
+					<?php endif;?>
+					
+					<?php
+						$class = 'stickie' . $info->stickie;
+						$highlight=$info->highlight;
+						$title=$highlight ? '<a style="font-weight: bold;font-size: 110%;color: '.$highlight.';" href="'.$infoLink.'" >'.$info->title.'</a>' : html::a($infoLink, $info->title);
+					?>
+					<td class='a-left nobr'><?php echo "<span class='$class'>{$lang->info->StickieList[$info->stickie]} </span>" . $title;?></td>
+					
 					<td><?php echo $users[$info->createdBy];?></td>
+					
+					<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
 					<td><?php echo substr($info->createdDate, 5, 11)?></td>
+					<?php endif;?>
+					
 					<td><?php echo $users[$info->lastEditedBy];?></td>
+					
+					<?php if($this->cookie->windowWidth >= $this->config->wideSize):?>
 					<td><?php echo substr($info->lastEditedDate, 5, 11)?></td>
+					<?php endif;?>
+					
 					<td>
 					<?php
 					$params = "infoID=$info->id";
 					common::printLink('info', 'edit', $params, $lang->info->buttonEdit);
-              		common::printLink('info', 'delete', $params, $lang->delete, 'hiddenwin');
+					common::printLink('info', 'delete', $params, $lang->delete, 'hiddenwin');
 					?>
-				  </td>
+					</td>
 				</tr>
 			<?php endforeach;?>
 			</tbody>
-			<tfoot><tr><td colspan='7'><?php $pager->show();?></td></tr></tfoot>
-		  </table>
+			<tfoot>
+				<tr>
+					<?php $columns = $this->cookie->windowWidth > $this->config->wideSize ? 8 : 5;?>
+					<td colspan='<?php echo $columns;?>'>
+						<div class='f-left'>
+						</div>
+						<div class='f-right'>
+							<?php $pager->show();?>
+						</div>
+					</td>
+				</tr>
+			</tfoot>
+			</table>
 		</td>
 	</tr>
 </table> 

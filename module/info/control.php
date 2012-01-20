@@ -14,7 +14,7 @@ class info extends control
 	{
 		$this->locate($this->createLink('info', 'browse'));
 	}
-	public function browse($libID = 'default', $moduleID = 0, $browseType = 'bymodule', $param = 0, $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
+	public function browse($libID = 'default', $moduleID = 0, $browseType = 'bymodule', $param = 0, $orderBy = 'lastEditedDate_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
 	{
 		/* Set browseType.*/ 
 		$browseType = strtolower($browseType);
@@ -23,17 +23,16 @@ class info extends control
 		{
 			$libID=$this->info->getDefaultLibId();
 		}
-		
-		if (!$libID){
-			$browseType = 'all';
-		}
-		
+//		if (!$libID){
+//			$browseType = 'all';
+//		}
+
 		/* Set menu, save session. */
 		$this->info->setMenu($this->infolibs, $libID,'info');
 		$this->session->set('infoList',   $this->app->getURI(true));
 		
 		/* Process the order by field. */
-		if(!$orderBy) $orderBy = $this->cookie->qaBugOrder ? $this->cookie->qaBugOrder : 'id_desc';
+		if(!$orderBy) $orderBy = $this->cookie->qaBugOrder ? $this->cookie->qaBugOrder : 'lastEditedDate_desc';
 		setcookie('qaBugOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
 		
 		/* Load pager. */
@@ -43,19 +42,70 @@ class info extends control
 		/* Get infos. */
 		$modules = 0;
 		$infos=array();
+		$tmpinfos=array();
+		$infos = $this->dao->select('*')->from(TABLE_INFO)->Where('deleted')->eq(0)
+					->andWhere('Stickie')->eq(2)->orderBy($orderBy)->fetchAll();
 		if($browseType == 'all')
 		{
-			$infos = $this->dao->select('*')->from(TABLE_INFO)->Where('deleted')->eq(0)
-				->orderBy($orderBy)->page($pager)->fetchAll();
+			$tmpinfos = $this->dao->select('*')->from(TABLE_INFO)->Where('deleted')->eq(0)
+				->andWhere('Stickie')->ne(2)->orderBy('Stickie_desc,'.$orderBy)->page($pager)->fetchAll();
 		}
-		else//if($browseType == "bymodule")
+		elseif($browseType == "bymodule")
 		{
 			$browseType = "bymodule";
 			if($moduleID) $modules = $this->info->getAllChildId($moduleID);
-			$infos = $this->info->getInfos( $libID, $modules, $orderBy, $pager);
+			$tmpinfos = $this->info->getInfos( $libID, $modules, 'Stickie_desc,'.$orderBy, $pager);
 		}
-		$users = $this->user->getPairs('noletter');
+		elseif($browseType == "bysearch")
+		{
+			if($queryID)
+			{
+				$query = $this->loadModel('search')->getQuery($queryID);
+				if($query)
+				{
+					$this->session->set('infoQuery', $query->sql);
+					$this->session->set('infoForm', $query->form);
+				}
+				else
+				{
+					$this->session->set('infoQuery', ' 1 = 1');
+				}
+			}
+			else
+			{
+				if($this->session->infoQuery == false) $this->session->set('infoQuery', ' 1 = 1');
+			}
+			$infoQuery=$this->session->infoQuery;
+			$infos=array();//置空总置顶
+			$tmpinfos = $this->dao->select('*')->from(TABLE_INFO)->where($infoQuery)
+			->andWhere('deleted')->eq(0)
+			->orderBy('Stickie_desc,'.$orderBy)->page($pager)->fetchAll();
+		}
+		$infos=array_merge($infos,$tmpinfos);
+		/* Process the sql, get the conditon partion, save it to session. Thus the report page can use the same condition. */
+		$sql = explode('WHERE', $this->dao->get());
+		$sql = explode('ORDER', $sql[1]);
+		$sql = explode('AND Stickie', $sql[0]);
+		//print $sql[0].'<br />';
+		$this->session->set('infoReportCondition', $sql[0]);
 		
+		//*********************************************************************************************
+		/* Build the search form. */
+		$this->config->info->search['actionURL'] = $this->createLink('info', 'browse', "libID=$libID&moduleID=$moduleID&browseType=bySearch&queryID=myQueryID");
+		$this->config->info->search['queryID']   = $queryID;
+		$this->config->info->search['params']['lib']['values']     = array(''=>'') + $this->infolibs;
+
+		/* Get the modules. */
+		$moduleOptionMenu = $this->info->getOptionMenu($libID, 'info', $startModuleID = 0);
+		$this->config->info->search['params']['module']['values']        = array(''=>'') + $moduleOptionMenu;
+		$this->view->searchForm = $this->fetch('search', 'buildForm', $this->config->info->search);
+		//*********************************************************************************************
+		
+		
+		$users = $this->user->getPairs('noletter');
+		if ($browseType == 'all') $this->view->header->title = $this->lang->info->index;
+		else
+			$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->index;
 		$this->view->moduleTree  = $this->info->getTreeMenu($libID, $viewType = 'info', $startModuleID = 0, array('infoModel', 'createInfoLink'));
 		$this->view->treeClass   = $browseType == 'bymodule' ? '' : 'hidden';
 		$this->view->browseType  = $browseType;
@@ -78,8 +128,9 @@ class info extends control
 		{
 			$infoID = $this->info->createInfo();
 			if(dao::isError()) die(js::error(dao::getError()));
-			$this->action->create('info', $infoID, 'Created');
+			$actionID = $this->action->create('info', $infoID, 'Created');
 
+			$this->sendmail($infoID, $actionID);
 			$vars = "libID=$libID&moduleID={$this->post->module}";
 			$link = $this->createLink('info', 'browse', $vars);
 			die(js::locate($link, 'parent'));
@@ -95,8 +146,12 @@ class info extends control
 		$this->view->position[]    = html::a($this->createLink('info', 'browse', "libID=$libID"), $this->infolibs[$libID]);
 		$this->view->position[]    = $this->lang->info->create;
 
+		/* Init vars. */
+		$mailto     = '';
+		$this->view->users = $this->user->getPairs('nodeleted');
+		$this->view->mailto           = $mailto;
 		$this->view->libID            = $libID;
-        $this->view->libs             = $this->info->getLibPairs($params = 'nodeleted');
+		$this->view->libs             = $this->info->getLibPairs($params = 'nodeleted');
 		$this->view->moduleOptionMenu = $moduleOptionMenu;
 		$this->view->moduleID         = $moduleID;
 
@@ -116,6 +171,7 @@ class info extends control
 				if(!empty($files)) $fileAction = $this->lang->addFiles . join(',', $files) . "\n" ;
 				$actionID = $this->action->create('info', $infoID, $action, $fileAction . $this->post->comment);
 				$this->action->logHistory($actionID, $changes);
+				$this->sendmail($infoID, $actionID);
 			}
 			die(js::locate($this->createLink('info', 'view', "infoID=$infoID"), 'parent'));
 		}
@@ -127,14 +183,14 @@ class info extends control
 
 		/* Get modules. */
 		$moduleOptionMenu = $this->info->getOptionMenu($libID, 'info', $startModuleID = 0);
-
+		$this->view->users            = $this->user->appendDeleted($this->user->getPairs('nodeleted'), "$info->mailto");
 		$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->edit;
 		$this->view->position[]    = html::a($this->createLink('info', 'browse', "libID=$libID"), $this->infolibs[$libID]);
 		$this->view->position[]    = $this->lang->info->edit;
 
 		$this->view->info             = $info;
 		$this->view->libID            = $libID;
-        $this->view->libs             = $this->info->getLibPairs();
+		$this->view->libs             = $this->info->getLibPairs();
 		$this->view->users            = $this->user->getPairs('noclosed,nodeleted');
 		$this->view->moduleOptionMenu = $moduleOptionMenu;
 		$this->display();
@@ -171,7 +227,7 @@ class info extends control
 		/* Assign. */
 		$this->view->modulePath  = $this->info->getParents($info->module);
 		$this->view->info         = $info;
-        $this->view->libName = $libName;
+		$this->view->libName = $libName;
 		$this->view->users       = $this->user->getPairs('noletter');
 		$this->view->actions     = $this->action->getList('info', $infoID);
 
@@ -207,7 +263,10 @@ class info extends control
 			}
 			die(js::locate($this->createLink($this->moduleName, 'browse', "libID=$libID"), 'parent'));
 		}
-		
+		if($libID=='default')
+		{
+			$libID=$this->info->getDefaultLibId();
+		}
 		$lib = $this->info->getLibByID($libID);
 		$this->view->libName = empty($lib) ? $libID : $lib->name;
 		$this->view->libID   = $libID;
@@ -217,6 +276,10 @@ class info extends control
 	}
 	public function deleteLib($libID, $confirm = 'no')
 	{
+		if($libID=='default')
+		{
+			$libID=$this->info->getDefaultLibId();
+		}
 		if($confirm == 'no')
 		{
 			die(js::confirm($this->lang->info->confirmDeleteLib, $this->createLink('info', 'deleteLib', "libID=$libID&confirm=yes")));
@@ -303,11 +366,169 @@ class info extends control
 		}
 	}
 	public function TreeAjaxGetOptionMenu($rootID, $viewType = 'info', $rootModuleID = 0, $returnType = 'html')
-    {
+	{
+		$this->view->productModules = $this->info->getOptionMenu($rootID, 'info');
+		$optionMenu = $this->info->getOptionMenu($rootID, $viewType, $rootModuleID);
+		if($returnType == 'html') die( html::select("module", $optionMenu, '', 'onchange=setAssignedTo()'));
+		if($returnType == 'json') die(json_encode($optionMenu));
+	}
+	public function upgrade()
+	{
+		$this->view->header->title = $this->lang->info->upgradeCommon . $this->lang->colon . $this->lang->info->upgradeSelectVersion;
+		$this->view->position[]    = $this->lang->info->upgradeCommon;
+		$this->display();
+	}
+	public function execute()
+	{
+		$this->info->execute($this->post->fromVersion);
 
-        $this->view->productModules = $this->info->getOptionMenu($rootID, 'info');
-        $optionMenu = $this->info->getOptionMenu($rootID, $viewType, $rootModuleID);
-        if($returnType == 'html') die( html::select("module", $optionMenu, '', 'onchange=setAssignedTo()'));
-        if($returnType == 'json') die(json_encode($optionMenu));
-    }
+		$this->view->header->title = $this->lang->info->upgradeResult;
+		$this->view->position[]    = $this->lang->info->upgradeCommon;
+
+		if(!$this->info->isError())
+		{
+			$this->view->result = 'Success';
+			$this->info->setVersion();
+		}
+		else
+		{
+			$this->view->result = 'Fail';
+			$this->view->errors = $this->info->getError();
+		}
+		$this->display();
+	}
+	private function sendmail($infoID, $actionID)
+	{
+		/* Set toList and ccList. */
+		$info         = $this->info->getInfoById($infoID);
+		$libName = $this->infolibs[$info->lib];
+		$modulePath  = $this->info->getParents($info->module);
+		$moduleName='';
+		foreach($modulePath as $key => $module){
+			$moduleName .= $module->name;
+			if(isset($modulePath[$key + 1])) $moduleName .= '-';
+		}
+		$toList      = '';
+		$ccList      = trim($info->mailto, ',');
+		if($toList == '')
+		{
+			if($ccList == '') return;
+			if(strpos($ccList, ',') === false)
+			{
+				$toList = $ccList;
+				$ccList = '';
+			}
+			else
+			{
+				$commaPos = strpos($ccList, ',');
+				$toList = substr($ccList, 0, $commaPos);
+				$ccList = substr($ccList, $commaPos + 1);
+			}
+		}
+
+		/* Get action info. */
+		$action          = $this->action->getById($actionID);
+		$history         = $this->action->getHistory($actionID);
+		$action->history = isset($history[$actionID]) ? $history[$actionID] : array();
+		if(strtolower($action->action) == 'Created') $action->comment = $info->content;
+
+		/* Create the mail content. */
+		$this->view->info    = $info;
+		$this->view->action = $action;
+		$mailContent = $this->parse($this->moduleName, 'sendmail');
+
+		/* Send it. */
+		$this->loadModel('mail')->send($toList, $libName . ':'.$moduleName . ':' . 'INFO #'. $info->id . $this->lang->colon . $info->title, $mailContent, $ccList);
+		if($this->mail->isError()) echo js::error($this->mail->getError());
+	}
+	public function export($productID, $orderBy)
+	{
+		if($_POST)
+		{
+			$infoLang   = $this->lang->info;
+			$infoConfig = $this->config->info;
+
+			/* Create field lists. */
+			$fields = explode(',', $infoConfig->list->exportFields);
+			foreach($fields as $key => $fieldName)
+			{
+				$fieldName = trim($fieldName);
+				$fields[$fieldName] = isset($infoLang->$fieldName) ? $infoLang->$fieldName : $fieldName;
+				unset($fields[$key]);
+			}
+
+			/* Get infos. */
+			$infos = $this->dao->select('*')->from(TABLE_INFO)->alias('t1')->where($this->session->infoReportCondition)->orderBy($orderBy)->fetchAll('id');
+			
+			/* Get users, products and projects. */
+			$users    = $this->loadModel('user')->getPairs('noletter');
+			$libs = $this->info->getLibPairs();
+
+			/* Get related objects id lists. */
+			$relatedModuleIdList = array();
+
+			foreach($infos as $info)
+			{
+				$relatedModuleIdList[$info->module]    = $info->module;
+			}
+
+			/* Get related objects title or names. */
+			$relatedModules = $this->dao->select('id, name')->from(TABLE_INFOMODULE)->where('id')->in($relatedModuleIdList)->fetchPairs();
+			$relatedFiles   = $this->dao->select('id, objectID, pathname, title')->from(TABLE_FILE)->where('objectType')->eq('info')->andWhere('objectID')->in(@array_keys($infos))->fetchGroup('objectID');
+
+			foreach($infos as $info)
+			{
+				if($this->post->fileType == 'csv')
+				{
+					$info->content = htmlspecialchars_decode($info->content);
+//                    $info->content = str_replace("<br />", "\n", $info->content);
+					$info->content = str_replace('"', '""', $info->content);
+				}
+
+				/* fill some field with useful value. */
+				if(isset($libs[$info->lib]))         $info->lib      = $libs[$info->lib];
+				if(isset($relatedModules[$info->module]))    $info->module       = $relatedModules[$info->module];
+
+				if(isset($infoLang->priList[$info->pri]))               $info->pri        = $infoLang->priList[$info->pri];
+				if(isset($users[$info->createdBy]))     $info->createdBy     = $users[$info->createdBy];
+				if(isset($users[$info->lastEditedBy])) $info->lastEditedBy = $users[$info->lastEditedBy];
+
+				$info->createdDate     = substr($info->createdDate,     0, 10);
+				$info->lastEditedDate = substr($info->lastEditedDate, 0, 10);
+
+				/* Set related files. */
+				if(isset($relatedFiles[$info->id]))
+				{
+					foreach($relatedFiles[$info->id] as $file)
+					{
+						$fileURL = 'http://' . $this->server->http_host . $this->config->webRoot . "data/upload/$info->company/" . $file->pathname;
+						$info->files .= html::a($fileURL, $file->title, '_blank') . '<br />';
+					}
+				}
+
+				$info->mailto = trim(trim($info->mailto), ',');
+				$mailtos      = explode(',', $info->mailto);
+				$info->mailto = '';
+				foreach($mailtos as $mailto)
+				{
+					$mailto = trim($mailto);
+					if(isset($users[$mailto])) $info->mailto .= $users[$mailto] . ',';
+				}
+
+				/* drop some field that is not needed. */
+				unset($info->company);
+				unset($info->deleted);
+			}
+
+			$this->post->set('fields', $fields);
+			$this->post->set('rows', $infos);
+			$this->fetch('file', 'export2' . $this->post->fileType, $_POST);
+		}
+
+		$this->display();
+	}
+	public function HighlightAndStickie()
+	{
+		$this->locate($this->createLink('info', 'browse'));
+	}
 }
