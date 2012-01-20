@@ -53,6 +53,10 @@ userList = "<?php echo join(',', array_keys($users));?>".split(',');
 			<td> <?php echo html::input('mailto', $mailto, 'class=text-4');?> </td>
 		</tr>
 		<tr>
+			<td class='rowhead'><?php echo $lang->info->pri;?></td>
+			<td><?php echo html::select('pri', $lang->info->priList, '0', 'class=select-3');?>
+		</tr>
+		<tr>
 			<th class='rowhead'><?php echo $lang->info->keywords;?></th>
 			<td><?php echo html::input('keywords', '', "class='text-1'");?></td>
 		</tr>    

@@ -13,9 +13,9 @@
 <?php include '../../common/view/header.lite.html.php';?>
 <form method='post'>
   <table class='table-1'> 
-    <caption><?php echo $lang->info->createLib;?></caption>
+    <caption><?php echo $lang->$type->createLib;?></caption>
     <tr>
-      <th class='rowhead'><?php echo $lang->info->libName;?></th>
+      <th class='rowhead'><?php echo $lang->$type->libName;?></th>
       <td><?php echo html::input('name', '', "class='text-1'");?></td>
     </tr>  
     <tr>

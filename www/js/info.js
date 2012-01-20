@@ -1,6 +1,6 @@
 function switchInfoLib(libID, module, method, extra)
 {
-    if(module == 'info')
+    if(module == 'info' || module == 'asset')
     {
         if(method != 'view' && method != 'edit')
         {
@@ -8,12 +8,8 @@ function switchInfoLib(libID, module, method, extra)
         }
         else
         {
-            link = createLink('info', 'browse');
+            link = createLink(module, 'browse');
         }
-    }
-    else if(module == 'tree')
-    {
-        link = createLink(module, method, "rootID=" + libID + '&type=' + extra);
     }
     location.href=link;
 }

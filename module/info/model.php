@@ -7,13 +7,13 @@ class infoModel extends model
 		$linkHtml = html::a(helper::createLink('info', 'browse', "libID={$module->root}&&moduleID={$module->id}"), $module->name, '_self', "id='module{$module->id}'");
 		return $linkHtml;
 	}
-	private function createManageLink($module)
+	private function createManageLink($module,$type='info')
 	{
 		static $users;
 		if(empty($users)) $users = $this->loadModel('user')->getPairs('noletter');
 		$linkHtml  = $module->name;
 		if(common::hasPriv('info', 'TreeEdit')) $linkHtml .= ' ' . html::a(helper::createLink('info', 'TreeEdit',   "module={$module->id}"), $this->lang->tree->edit, '', 'class="iframe"');
-		if(common::hasPriv('info', 'TreeManage')) $linkHtml .= ' ' . html::a(helper::createLink('info', 'TreeManage', "root={$module->root}&module={$module->id}"), $this->lang->tree->child);
+		if(common::hasPriv('info', 'TreeManage')) $linkHtml .= ' ' . html::a(helper::createLink('info', 'TreeManage', "root={$module->root}&module={$module->id}&type=$type"), $this->lang->tree->child);
 		if(common::hasPriv('info', 'TreeDelete')) $linkHtml .= ' ' . html::a(helper::createLink('info', 'TreeDelete', "root={$module->root}&module={$module->id}"), $this->lang->delete, 'hiddenwin');
 		if(common::hasPriv('info', 'TreeUpdateOrder')) $linkHtml .= ' ' . html::input("orders[$module->id]", $module->order, 'style="width:30px;text-align:center"');
 		return $linkHtml;
@@ -31,7 +31,7 @@ class infoModel extends model
 			->cleanInt('module')
 			->remove('files, labels')
 			->get();
-		$condition = "module = $info->module";
+		$condition = "module = '$info->module'";
 		$this->dao->insert(TABLE_INFO)
 			->data($info)
 			->autoCheck()
@@ -46,34 +46,48 @@ class infoModel extends model
 		}
 		return false;
 	}
-	public function createLib()
+	public function createLib($type='info')
 	{
-		$lib = fixer::input('post')->stripTags('name')->get();
-		$defaultLibID=$this->getDefaultLibId();
+		$lib = fixer::input('post')->stripTags('name')->add('type',$type)->get();
+		$defaultLibID=$this->getDefaultLibId($type);
 		if (!$defaultLibID){
-			$this->clearDefaultLib();
+			$this->clearDefaultLib($type);
 			$lib->defaultlib='1';
 		}
+		$condition = "type = '$type'";
 		$this->dao->insert(TABLE_INFOLIB)
 			->data($lib)
 			->autoCheck()
 			->batchCheck('name', 'notempty')
-			->check('name', 'unique')
+			->check('name', 'unique',$condition)
 			->exec();
 		return $this->dao->lastInsertID();
 	}
-	public function getDefaultLibId()
+	public function getDefaultLibId($type='info')
 	{
 		$lib = $this->dao->select('id')->from(TABLE_INFOLIB)
 			->where('defaultlib')->eq(1)
+			->andWhere('type')->eq($type)
 			->andWhere('deleted')->eq(0)
 			->fetch();
 		if (!$lib) return false;
 		return $lib->id;
 	}
-	public function getInfoLibs()
+	public function getLibs($type='info')
 	{
-		$infolibs = $this->dao->select('id, name')->from(TABLE_INFOLIB)->where('deleted')->eq(0)->fetchPairs();
+		//此处有一个历史遗留问题,0.3版本以前的infolib库里无type列
+		$test=$this->app->dbh->query('desc '.TABLE_INFOLIB.' type')->fetch(PDO::FETCH_OBJ);
+		//print $test->Field.'<br />';
+		if (!$test->Field) {
+			$infolibs = $this->dao->select('id, name')->from(TABLE_INFOLIB)->where('deleted')->eq(0)->fetchPairs();
+			//echo js::alert($this->lang->info->pleaseUpgrade);
+		}
+		else{
+			$infolibs = $this->dao->select('id, name')->from(TABLE_INFOLIB)->where('deleted')->eq(0)->andWhere('type')->eq($type)->fetchPairs();
+		}
+//		while (list($key, $val) = each($test)) {
+//			echo "$key => $val\n";
+//		}
 		return $infolibs;
 	}
 	public function getInfoById($infoID)
@@ -95,11 +109,11 @@ class infoModel extends model
 	{
 		return $this->dao->findById((int)$moduleID)->from(TABLE_INFOMODULE)->fetch();
 	}
-	public function getAllChildId($moduleID)
+	public function getAllChildId($moduleID,$type='info')
 	{
 		if($moduleID == 0) return array();
 		$module = $this->getModuleById((int)$moduleID);
-		return $this->dao->select('id')->from(TABLE_INFOMODULE)->where('path')->like($module->path . '%')->fetchPairs();
+		return $this->dao->select('id')->from(TABLE_INFOMODULE)->where('path')->like($module->path . '%')->andWhere('type')->eq($type)->fetchPairs();
 	}
 	public function getInfos($libID, $module, $orderBy, $pager)
 	{
@@ -131,11 +145,12 @@ class infoModel extends model
 			->orderBy('`order`')
 			->fetchAll();
 	}
-	public function getLibPairs($param = 'all')
+	public function getLibPairs($param = 'all',$type='info')
 	{
 		$libs = array();
 		$datas = $this->dao->select('id, name, deleted')
 			->from(TABLE_INFOLIB)
+			->where('type')->eq($type)
 			->orderBy('id desc')
 			->fetchAll();
 
@@ -233,16 +248,27 @@ class infoModel extends model
 		}
 		return $lastMenu;
 	}
-	public function setMenu($libs, $libID, $extra = '')
+	public function getFieldPairs($fields,$type='info')
+    {
+        $fields = explode(',', $fields);
+        foreach($fields as $key => $field)
+        {
+            $field = trim($field);
+            $fields[$field] = $this->lang->$type->$field;
+            unset($fields[$key]);
+        }
+        return $fields;
+    }
+	public function setMenu($libs, $libID, $type = 'info')
 	{
 		$currentModule = $this->app->getModuleName();
 		$currentMethod = $this->app->getMethodName();
 
-		$selectHtml = html::select('libID', $libs, $libID, "onchange=\"switchInfoLib(this.value, '$currentModule', '$currentMethod', '$extra');\"");
-		common::setMenuVars($this->lang->info->menu, 'list', $selectHtml . $this->lang->arrow);
-		foreach($this->lang->info->menu as $key => $menu)
+		$selectHtml = html::select('libID', $libs, $libID, "onchange=\"switchInfoLib(this.value, '$currentModule', '$currentMethod', '');\"");
+		common::setMenuVars($this->lang->$type->menu, 'list', $selectHtml . $this->lang->arrow);
+		foreach($this->lang->$type->menu as $key => $menu)
 		{
-			if($key != 'list') common::setMenuVars($this->lang->info->menu, $key, $libID);
+			if($key != 'list') common::setMenuVars($this->lang->$type->menu, $key, $libID);
 		}
 	}
 	private function buildMenuQuery($rootID, $type, $startModule)
@@ -277,20 +303,22 @@ class infoModel extends model
 			->add('lastEditedDate',$now)
 			->get();
 
-		$condition = "lib = '$info->lib' AND module = $info->module AND id != $infoID";
+		$condition = "lib = '$info->lib' AND module = '$info->module' AND id != '$infoID'";
 		$this->dao->update(TABLE_INFO)->data($info)
 			->autoCheck()
-			->batchCheck($this->config->doc->edit->requiredFields, 'notempty')
+			->batchCheck($this->config->info->edit->requiredFields, 'notempty')
 			->check('title', 'unique', $condition)
 			->where('id')->eq((int)$infoID)
 			->exec();
+		$info->editedCount=$info->editedCount-1;
 		if(!dao::isError()) return common::createChanges($oldInfo, $info);
 	}
-	public function updateLib($libID)
+	public function updateLib($libID,$type)
 	{
 		$libID  = (int)$libID;
 		$oldLib = $this->getLibById($libID);
 		$lib = fixer::input('post')->stripTags('name')
+				->add('type',$type)
 				->setIF('$defaultlib==on','defaultlib','1')
 				->setIF('$defaultlib==off','defaultlib','0')
 				->get();
@@ -299,14 +327,14 @@ class infoModel extends model
 		if ($libID==$oldDefaultLibID)
 				$lib->defaultlib=1;
 		else if ($lib->defaultlib=1){
-			$this->clearDefaultLib();
+			$this->clearDefaultLib($type);
 		}
-		
+		$condition = "type = '$type' and id != '$libID'";
 		$this->dao->update(TABLE_INFOLIB)
 			->data($lib)
 			->autoCheck()
 			->batchCheck('name', 'notempty')
-			->check('name', 'unique', "id != $libID")
+			->check('name', 'unique', $condition)
 			->where('id')->eq($libID)
 			->exec();
 		if(!dao::isError()) return common::createChanges($oldLib, $lib);
@@ -331,11 +359,12 @@ class infoModel extends model
 			$this->dao->update(TABLE_INFOMODULE)->set('`order`')->eq($order)->where('id')->eq((int)$moduleID)->limit(1)->exec();
 		}
 	}
-	private function clearDefaultLib()
+	private function clearDefaultLib($type='info')
 	{
 		$cleanDefaultLib->defaultlib=0;
 		$this->dao->update(TABLE_INFOLIB)
 			->data($cleanDefaultLib)
+			->where('type')->eq($type)
 			->autoCheck()
 			->exec();
 	}
@@ -351,7 +380,7 @@ class infoModel extends model
 
 		if($module->type == 'info') $this->dao->update(TABLE_INFO)->set('module')->eq($module->parent)->where('module')->eq($moduleID)->exec();
 	}
-	public function manageChild($rootID, $parentModuleID, $childs)
+	public function manageChild($rootID, $type, $parentModuleID, $childs)
 	{
 		$parentModule = $this->getModuleById($parentModuleID);
 		if($parentModule)
@@ -365,7 +394,6 @@ class infoModel extends model
 			$parentPath = ',';
 		}
 		$i = 1;
-		$type='info';
 		foreach($childs as $moduleID => $moduleName)
 		{
 			if(empty($moduleName)) continue;
@@ -456,9 +484,12 @@ class infoModel extends model
 	}
 	public function execute($fromVersion)
 	{
-		if($fromVersion == '0_1')
-		{
+		if($fromVersion == '0_1'){
 			$this->upgradeFrom0_1To0_2();
+			$this->upgradeFrom0_2To0_3();
+		}
+		elseif ($fromVersion == '0_2'){
+			$this->upgradeFrom0_2To0_3();
 		}
 	}
 	private function execSQL($sqlFile)
@@ -504,6 +535,12 @@ class infoModel extends model
 	private function upgradeFrom0_1To0_2()
 	{
 		$this->execSQL($this->getUpgradeFile('0.2'));
+		$this->setVersion('0.2');
+	}
+	private function upgradeFrom0_2To0_3()
+	{
+		$this->execSQL($this->getUpgradeFile('0.3'));
+		$this->setVersion('0.3');
 	}
 	/**
 	 * Judge any error occers.
@@ -528,13 +565,13 @@ class infoModel extends model
 		self::$errors = array();
 		return $errors;
 	}
-	public function setVersion()
+	public function setVersion($version)
     {
         $item->company = 0;
         $item->owner   = 'system';
         $item->section = 'global';
         $item->key     = 'infoplugin';
-        $item->value   =  $config->infoVersion;
+        $item->value   = $version;
 
         $config = $this->dao->select('id, value')->from(TABLE_CONFIG)
             ->where('company')->eq(0)
@@ -545,6 +582,9 @@ class infoModel extends model
         if(!$config)
         {
             $this->dao->insert(TABLE_CONFIG)->data($item)->exec($autoCompany = false);
+        }
+        else{
+        	$this->dao->update(TABLE_CONFIG)->data($item)->where('id')->eq($config->id)->exec($autoCompany = false);
         }
     }
     public function getVersion()

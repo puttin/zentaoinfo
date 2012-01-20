@@ -8,7 +8,8 @@ class info extends control
 		$this->loadModel('tree');
 		$this->loadModel('user');
 		$this->loadModel('action');
-		$this->infolibs = $this->info->getInfoLibs();
+		$this->app->loadLang('asset',$exit = false);
+		$this->infolibs = $this->info->getLibs();
 	}
 	public function index()
 	{
@@ -26,14 +27,15 @@ class info extends control
 //		if (!$libID){
 //			$browseType = 'all';
 //		}
+		$libName = $this->infolibs[$libID];
 
 		/* Set menu, save session. */
 		$this->info->setMenu($this->infolibs, $libID,'info');
 		$this->session->set('infoList',   $this->app->getURI(true));
 		
 		/* Process the order by field. */
-		if(!$orderBy) $orderBy = $this->cookie->qaBugOrder ? $this->cookie->qaBugOrder : 'lastEditedDate_desc';
-		setcookie('qaBugOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
+		if(!$orderBy) $orderBy = $this->cookie->infoOrder ? $this->cookie->infoOrder : 'lastEditedDate_desc';
+		setcookie('infoOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
 		
 		/* Load pager. */
 		$this->app->loadClass('pager', $static = true);
@@ -52,9 +54,40 @@ class info extends control
 		}
 		elseif($browseType == "bymodule")
 		{
-			$browseType = "bymodule";
 			if($moduleID) $modules = $this->info->getAllChildId($moduleID);
 			$tmpinfos = $this->info->getInfos( $libID, $modules, 'Stickie_desc,'.$orderBy, $pager);
+		}
+		elseif($browseType == 'createdbyme')
+		{
+			if($moduleID) $modules = $this->info->getAllChildId($moduleID);
+			$infos = $this->dao->findBycreatedBy($this->app->user->account)->from(TABLE_INFO)
+					->beginIF(is_numeric($libID))->andWhere('lib')->eq($libID)->fi()
+					->beginIF($modules)->andWhere('module')->in($modules)->fi()
+					->andWhere('deleted')->eq(0)
+					->orderBy('Stickie_desc,'.$orderBy)
+					->page($pager)->fetchAll();
+		}
+		elseif($browseType == 'postponed')
+		{
+			if($moduleID) $modules = $this->info->getAllChildId($moduleID);
+			$infos = $this->dao->findBydeadline('<',date('Y-m-d'))->from(TABLE_INFO)
+					->andWhere("(`deadline` <> '0000-00-00')")
+					->beginIF(is_numeric($libID))->andWhere('lib')->eq($libID)->fi()
+					->beginIF($modules)->andWhere('module')->in($modules)->fi()
+					->andWhere('deleted')->eq(0)
+					->orderBy('Stickie_desc,'.$orderBy)
+					->page($pager)->fetchAll();
+		}
+		elseif($browseType == 'mailtome')
+		{
+			if($moduleID) $modules = $this->info->getAllChildId($moduleID);
+			$infos = $this->dao->findBymailto('LIKE','%%'.$this->app->user->account.'%%')
+					->from(TABLE_INFO)
+					->beginIF(is_numeric($libID))->andWhere('lib')->eq($libID)->fi()
+					->beginIF($modules)->andWhere('module')->in($modules)->fi()
+					->andWhere('deleted')->eq(0)
+					->orderBy('Stickie_desc,'.$orderBy)
+					->page($pager)->fetchAll();
 		}
 		elseif($browseType == "bysearch")
 		{
@@ -89,6 +122,32 @@ class info extends control
 		//print $sql[0].'<br />';
 		$this->session->set('infoReportCondition', $sql[0]);
 		
+		/* Get custom fields. */
+		$customFields = $this->cookie->infoFields != false ? $this->cookie->infoFields : $this->config->info->list->defaultFields;
+		$customed     = !($customFields == $this->config->info->list->defaultFields);
+ 
+		/* If customed, get related name or titles. */
+		if($customed)
+		{
+			/* Get related objects id lists. */
+			$relatedModuleIdList   = array();
+			$relatedLibIdList  = array();
+
+			foreach($infos as $info)
+			{
+				$relatedModuleIdList[$info->module]   = $info->module;
+				$relatedLibIdList[$info->lib] = $info->lib;
+
+				/* Get related objects title or names. */
+				$relatedModules   = $this->dao->select('id, name')->from(TABLE_INFOMODULE)->where('id')->in($relatedModuleIdList)->fetchPairs();
+				$relatedLibs  = $this->dao->select('id, name')->from(TABLE_INFOLIB)->where('id')->in($relatedLibIdList)->fetchPairs();
+
+				/* fill some field with useful value. */
+				if(isset($relatedModules[$info->module]))    $info->module       = $relatedModules[$info->module];
+				if(isset($relatedLibs[$info->lib]))  $info->lib      = $relatedLibs[$info->lib];
+			}
+		}
+		
 		//*********************************************************************************************
 		/* Build the search form. */
 		$this->config->info->search['actionURL'] = $this->createLink('info', 'browse', "libID=$libID&moduleID=$moduleID&browseType=bySearch&queryID=myQueryID");
@@ -104,8 +163,11 @@ class info extends control
 		
 		$users = $this->user->getPairs('noletter');
 		if ($browseType == 'all') $this->view->header->title = $this->lang->info->index;
-		else
+		else{
 			$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->index;
+			$this->view->position[]    = html::a($this->createLink('info', 'browse', "libID=$libID"), $libName);
+		}
+		$this->view->position[]    = $this->lang->info->list;
 		$this->view->moduleTree  = $this->info->getTreeMenu($libID, $viewType = 'info', $startModuleID = 0, array('infoModel', 'createInfoLink'));
 		$this->view->treeClass   = $browseType == 'bymodule' ? '' : 'hidden';
 		$this->view->browseType  = $browseType;
@@ -116,6 +178,8 @@ class info extends control
 		$this->view->pager       = $pager;
 		$this->view->param       = $param;
 		$this->view->orderBy     = $orderBy;
+		$this->view->customed    = $customed;
+		$this->view->customFields= explode(',', str_replace(' ', '', trim($customFields)));
 		$this->display();
 	}
 	public function create($libID, $moduleID = 0)
@@ -143,7 +207,6 @@ class info extends control
 		$moduleOptionMenu = $this->info->getOptionMenu($libID, 'info', $startModuleID = 0);
 
 		$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->create;
-		$this->view->position[]    = html::a($this->createLink('info', 'browse', "libID=$libID"), $this->infolibs[$libID]);
 		$this->view->position[]    = $this->lang->info->create;
 
 		/* Init vars. */
@@ -157,13 +220,17 @@ class info extends control
 
 		$this->display();
 	}
-	public function edit($infoID)
+	public function edit($infoID,$comment = false)
 	{
 		if(!empty($_POST))
 		{
-			$changes  = $this->info->update($infoID);
-			if(dao::isError()) die(js::error(dao::getError()));
-			$files = $this->loadModel('file')->saveUpload('info', $infoID);
+			$changes = array();
+			$files   = array();
+			if($comment == false){
+				$changes  = $this->info->update($infoID);
+				if(dao::isError()) die(js::error(dao::getError()));
+				$files = $this->loadModel('file')->saveUpload('info', $infoID);
+			}
 			if($this->post->comment != '' or !empty($changes) or !empty($files))
 			{
 				$action = !empty($changes) ? 'Edited' : 'Commented';
@@ -185,9 +252,8 @@ class info extends control
 		$moduleOptionMenu = $this->info->getOptionMenu($libID, 'info', $startModuleID = 0);
 		$this->view->users            = $this->user->appendDeleted($this->user->getPairs('nodeleted'), "$info->mailto");
 		$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->edit;
-		$this->view->position[]    = html::a($this->createLink('info', 'browse', "libID=$libID"), $this->infolibs[$libID]);
 		$this->view->position[]    = $this->lang->info->edit;
-
+		$this->view->actions          = $this->action->getList('info', $infoID);
 		$this->view->info             = $info;
 		$this->view->libID            = $libID;
 		$this->view->libs             = $this->info->getLibPairs();
@@ -233,87 +299,89 @@ class info extends control
 
 		$this->display();
 	}
-	public function createLib()
+	public function createLib($type='info')
 	{
 		if(!empty($_POST))
 		{
-			$libID = $this->info->createLib();
+			$libID = $this->info->createLib($type);
 			if(!dao::isError())
 			{
-				$this->loadModel('action')->create('infoLib', $libID, 'Created');
-				die(js::locate($this->createLink($this->moduleName, 'browse', "libID=$libID"), 'parent'));
+				$this->loadModel('action')->create($type.'Lib', $libID, 'Created');
+				die(js::locate($this->createLink($type, 'browse', "libID=$libID"), 'parent'));
 			}
 			else
 			{
 				echo js::error(dao::getError());
 			}
 		}
+		$this->view->type = $type;
 		die($this->display());
 	}
-	public function editLib($libID)
+	public function editLib($libID,$type='info')
 	{
 		if(!empty($_POST))
 		{
-			$changes = $this->info->updateLib($libID); 
+			$changes = $this->info->updateLib($libID,$type); 
 			if(dao::isError()) die(js::error(dao::getError()));
 			if($changes)
 			{
-				$actionID = $this->loadModel('action')->create('infoLib', $libID, 'edited');
+				$actionID = $this->loadModel('action')->create($type.'Lib', $libID, 'edited');
 				$this->action->logHistory($actionID, $changes);
 			}
-			die(js::locate($this->createLink($this->moduleName, 'browse', "libID=$libID"), 'parent'));
+			die(js::locate($this->createLink($type, 'browse', "libID=$libID"), 'parent'));
 		}
 		if($libID=='default')
 		{
-			$libID=$this->info->getDefaultLibId();
+			$libID=$this->info->getDefaultLibId($type);
 		}
 		$lib = $this->info->getLibByID($libID);
 		$this->view->libName = empty($lib) ? $libID : $lib->name;
 		$this->view->libID   = $libID;
 		$this->view->defaultLib   = $lib->defaultlib;
+		$this->view->type = $type;
 		
 		die($this->display());
 	}
-	public function deleteLib($libID, $confirm = 'no')
+	public function deleteLib($libID,$type='info',$confirm = 'no')
 	{
 		if($libID=='default')
 		{
-			$libID=$this->info->getDefaultLibId();
+			$libID=$this->info->getDefaultLibId($type);
 		}
 		if($confirm == 'no')
 		{
-			die(js::confirm($this->lang->info->confirmDeleteLib, $this->createLink('info', 'deleteLib', "libID=$libID&confirm=yes")));
+			die(js::confirm($this->lang->$type->confirmDeleteLib, $this->createLink('info', 'deleteLib', "libID=$libID&type=$type&confirm=yes")));
 		}
 		else
 		{
 			$this->info->delete(TABLE_INFOLIB, $libID);
-			die(js::locate($this->createLink('info', 'browse'), 'parent'));
+			die(js::locate($this->createLink($type, 'browse'), 'parent'));
 		}
 	}
-	public function TreeManage($rootID, $currentModuleID = 0)
+	public function TreeManage($rootID, $currentModuleID = 0,$type='info')
 	{
-		$viewType='info';
 		$lib = $this->loadModel('info')->getLibById($rootID);
 		$this->view->root = $lib;
-		$this->info->setMenu($this->info->getInfoLibs(), $rootID, 'info');
-		$this->lang->set('menugroup.info', 'info');
-
-		$header['title'] = $this->lang->info->manageCustomInfo . $this->lang->colon . $lib->name;
-		$position[]      = html::a($this->createLink('info', 'browse', "libID=$rootID"), $lib->name);
-		$position[]      = $this->lang->info->manageCustomInfo;
+		$this->info->setMenu($this->info->getLibs($type), $rootID, $type);
+		$this->lang->set('menugroup.tree', $type);
+		$this->lang->info->menu = $this->lang->$type->menu;
+		
+		$header['title'] = $this->lang->$type->manageCustom . $this->lang->colon . $lib->name;
+		$position[]      = html::a($this->createLink($type, 'browse', "libID=$rootID"), $lib->name);
+		$position[]      = $this->lang->$type->manageCustom;
 		
 		$parentModules = $this->info->getParents($currentModuleID);
 		$this->view->header          = $header;
 		$this->view->position        = $position;
 		$this->view->rootID          = $rootID;
-		$this->view->viewType        = $viewType;
-		$this->view->modules         = $this->info->getTreeMenu($rootID, $viewType, $rooteModuleID = 0, array('infoModel', 'createManageLink'));
-		$this->view->sons            = $this->info->getSons($rootID, $currentModuleID, $viewType);
+		$this->view->modules         = $this->info->getTreeMenu($rootID, $type, $rooteModuleID = 0, array('infoModel', 'createManageLink'),$type);
+		$this->view->sons            = $this->info->getSons($rootID, $currentModuleID, $type);
 		$this->view->currentModuleID = $currentModuleID;
 		$this->view->parentModules   = $parentModules;
+		$this->view->type = $type;
 		$this->display();
 	}
-	public function TreeEdit($moduleID)
+	public function TreeEdit($moduleID,$type='info')
 	{
 		if(!empty($_POST))
 		{
@@ -327,7 +395,7 @@ class info extends control
 		   //$module->owner = $this->loadModel('product')->getById($module->root)->QM;
 		}
 		$this->view->module     = $module;
-		$this->view->optionMenu = $this->info->getOptionMenu($this->view->module->root);
+		$this->view->optionMenu = $this->info->getOptionMenu($this->view->module->root,$type);
 		$this->view->users      = $this->loadModel('user')->getPairs('noclosed');
 
 		/* Remove self and childs from the $optionMenu. Because it's parent can't be self or childs. */
@@ -349,11 +417,11 @@ class info extends control
 			die(js::reload('parent'));
 		}
 	}
-	public function TreeManageChild($rootID)
+	public function TreeManageChild($rootID, $type='info')
 	{
 		if(!empty($_POST))
 		{
-			$this->info->manageChild($rootID, $_POST['parentModuleID'], $_POST['modules']);
+			$this->info->manageChild($rootID,$type, $_POST['parentModuleID'], $_POST['modules']);
 			die(js::reload('parent'));
 		}
 	}
@@ -365,10 +433,10 @@ class info extends control
 			die(js::reload('parent'));
 		}
 	}
-	public function TreeAjaxGetOptionMenu($rootID, $viewType = 'info', $rootModuleID = 0, $returnType = 'html')
+	public function TreeAjaxGetOptionMenu($rootID, $type = 'info', $rootModuleID = 0, $returnType = 'html')
 	{
-		$this->view->productModules = $this->info->getOptionMenu($rootID, 'info');
-		$optionMenu = $this->info->getOptionMenu($rootID, $viewType, $rootModuleID);
+		$this->view->productModules = $this->info->getOptionMenu($rootID, $type);
+		$optionMenu = $this->info->getOptionMenu($rootID, $type, $rootModuleID);
 		if($returnType == 'html') die( html::select("module", $optionMenu, '', 'onchange=setAssignedTo()'));
 		if($returnType == 'json') die(json_encode($optionMenu));
 	}
@@ -388,7 +456,6 @@ class info extends control
 		if(!$this->info->isError())
 		{
 			$this->view->result = 'Success';
-			$this->info->setVersion();
 		}
 		else
 		{
@@ -401,6 +468,7 @@ class info extends control
 	{
 		/* Set toList and ccList. */
 		$info         = $this->info->getInfoById($infoID);
+		$info->title  = htmlspecialchars_decode($info->title);
 		$libName = $this->infolibs[$info->lib];
 		$modulePath  = $this->info->getParents($info->module);
 		$moduleName='';
@@ -441,7 +509,7 @@ class info extends control
 		$this->loadModel('mail')->send($toList, $libName . ':'.$moduleName . ':' . 'INFO #'. $info->id . $this->lang->colon . $info->title, $mailContent, $ccList);
 		if($this->mail->isError()) echo js::error($this->mail->getError());
 	}
-	public function export($productID, $orderBy)
+	public function export($libID, $orderBy)
 	{
 		if($_POST)
 		{
@@ -460,7 +528,7 @@ class info extends control
 			/* Get infos. */
 			$infos = $this->dao->select('*')->from(TABLE_INFO)->alias('t1')->where($this->session->infoReportCondition)->orderBy($orderBy)->fetchAll('id');
 			
-			/* Get users, products and projects. */
+			/* Get users, libs. */
 			$users    = $this->loadModel('user')->getPairs('noletter');
 			$libs = $this->info->getLibPairs();
 
@@ -530,5 +598,22 @@ class info extends control
 	public function HighlightAndStickie()
 	{
 		$this->locate($this->createLink('info', 'browse'));
+	}
+	public function customFields()
+	{
+		if($_POST)
+		{
+			$customFields = $this->post->customFields;
+			$customFields = join(',', $customFields);
+			setcookie('infoFields', $customFields, $this->config->cookieLife, $this->config->webRoot);
+			die(js::reload('parent'));
+		}
+
+		$customFields = $this->cookie->infoFields ? $this->cookie->infoFields : $this->config->info->list->defaultFields;
+
+		$this->view->allFields     = $this->info->getFieldPairs($this->config->info->list->allFields);
+		$this->view->customFields  = $this->info->getFieldPairs($customFields);
+		$this->view->defaultFields = $this->info->getFieldPairs($this->config->info->list->defaultFields);
+		die($this->display());
 	}
 }

@@ -3,7 +3,7 @@
 <table class='cont-lt5'>
   <tr valign='top'>
     <td class='side'>
-      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'TreeUpdateOrder', "root={$root->id}&viewType=$viewType");?>'>
+      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'TreeUpdateOrder', "root={$root->id}&type=$type");?>'>
         <table class='table-1'>
           <caption><?php echo $header->title;?></caption>
           <tr>
@@ -19,18 +19,18 @@
     </td>
     <td class='divider'></td>
     <td>
-      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'TreeManageChild', "root={$root->id}");?>'>
+      <form method='post' target='hiddenwin' action='<?php echo $this->createLink('info', 'TreeManageChild', "root={$root->id}&type=$type");?>'>
         <table align='center' class='table-1'>
           <caption><?php echo $lang->tree->manageChild;?></caption>
           <tr>
             <td width='10%'>
               <nobr>
               <?php
-              echo html::a($this->createLink('info', 'TreeManage', "root={$root->id}"), $root->name);
+              echo html::a($this->createLink('info', 'TreeManage', "root={$root->id}&module=0&type=$type"), $root->name);
               echo $lang->arrow;
               foreach($parentModules as $module)
               {
-                  echo html::a($this->createLink('info', 'TreeManage', "root={$root->id}&moduleID=$module->id"), $module->name);
+                  echo html::a($this->createLink('info', 'TreeManage', "root={$root->id}&moduleID=$module->id&type=$type"), $module->name);
                   echo $lang->arrow;
               }
               ?>

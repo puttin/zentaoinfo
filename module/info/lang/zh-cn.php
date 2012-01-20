@@ -1,11 +1,12 @@
 <?php
 /**
- * The install module zh-cn	file of	ZenTaoPMS.
+ * The install module zh-cn file of ZenTaoPMS.
  *
  * @author		Yanzhi Wang
  * @package		info
  */
 $lang->info->common				= '信息公告';
+$lang->info->list				= '公告列表';
 $lang->info->module				= '模块';
 $lang->info->welcome				= '感谢您选择使用信息公告插件! ';
 $lang->info->gotoInfoIndex		= '您是否需要前往信息公告首页?';
@@ -33,6 +34,9 @@ $lang->info->TreeAjaxGetSonModules = '接口:获得子菜单列表';
 /* 查询条件列表。*/
 $lang->info->moduleInfos			= '按模块浏览';
 $lang->info->allInfos			= '全部公告';
+$lang->info->createdByMe			= '由我创建';
+$lang->info->postponed			= '已过期';
+$lang->info->mailtome			= '抄送给我';
 
 /* 字段列表。*/
 $lang->info->id             = '公告编号';
@@ -64,20 +68,22 @@ $lang->info->searchInfo = '搜索';
 $lang->info->stickie              = '置顶';
 $lang->info->highlight              = '高亮';
 
+/* 功能按钮。*/
 $lang->info->buttonEdit			= '编辑';
 $lang->info->buttonCopy			= '拷贝';
 
-
+/* 交互提示。*/
 $lang->info->confirmDelete      = "您确定删除该公告吗？";
 $lang->info->confirmDeleteLib   = " 您确定删除该公告库吗？";
 $lang->info->noLib   = " 不存在公告库,请先建立公告库";
 $lang->info->pleaseUpgrade = '请联系管理员升级插件!';
 
-$lang->info->manageCustomInfo   = '维护公告库模块';
+$lang->info->manageCustom   = '维护公告库模块';
 $lang->info->confirmChangeLib   = '修改公告库会导致相应的分类发生变化，确定吗？';
 $lang->info->confirmUninstallPlugin   = '卸载禅道信息公告插件会删除所有该插件的动态信息,造成之后再使用时,所有公告历史记录消失!您确认卸载该插件吗?';
 $lang->info->pleaseGoToDeletePreuninstall ='请前往 "%s" 目录删除 preuninstall.php 文件后再重新卸载.';
 
+/* 插件升级。*/
 $lang->info->upgradeCommon  = '升级插件';
 $lang->info->upgradeResult  = '升级结果';
 $lang->info->upgradeFail    = '升级失败';
@@ -89,19 +95,17 @@ $lang->info->upgradeFromVersion   = '原来的插件版本';
 $lang->info->upgradeToVersion     = '升级到';
 
 $lang->info->upgradeFromVersions['0_1']   = '0.1 或 0.1.1';
+$lang->info->upgradeFromVersions['0_2']   = '0.2';
 
+/* 邮件抄送。*/
 $lang->info->mailModify ='此次变化';
 $lang->info->mailMain ='当前内容';
 $lang->info->mailto           = '抄送给';
 $lang->info->lblMailto                   = '抄送给';
 
-$lang->info->priList[0] = '';
-$lang->info->priList[1] = '1';
-$lang->info->priList[2] = '2';
-$lang->info->priList[3] = '3';
-$lang->info->priList[4] = '4';
 $lang->info->delayWarning        = " <strong class='delayed f-14px'> 过期%s天 </strong>";
 
+/* 各个字段取值列表。*/
 $lang->info->StickieList[0] = '';
 $lang->info->StickieList[1] = '[置顶]';
 $lang->info->StickieList[2] = '[总置顶]';
@@ -110,7 +114,14 @@ $lang->info->StickieLable[0] = '普通';
 $lang->info->StickieLable[1] = '置顶';
 $lang->info->StickieLable[2] = '总置顶';
 
+$lang->info->priList[0] = '';
 $lang->info->priList[1] = '1';
 $lang->info->priList[2] = '2';
 $lang->info->priList[3] = '3';
 $lang->info->priList[4] = '4';
+
+/* 自定义字段 */
+$lang->info->customFields   = '自定义字段';
+$lang->info->restoreDefault = '恢复默认';
+$lang->info->lblAllFields                = '所有字段';
+$lang->info->lblCustomFields             = '自定义字段';

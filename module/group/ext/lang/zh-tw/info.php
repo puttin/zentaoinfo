@@ -7,6 +7,7 @@ $lang->resource->info->edit = 'edit';
 $lang->resource->info->delete = 'delete';
 $lang->resource->info->view = 'view';
 $lang->resource->info->export = 'export';
+$lang->resource->info->customFields        = 'customFields';
 $lang->resource->info->HighlightAndStickie = 'HighlightAndStickie';
 
 $lang->resource->info->createLib      = 'createLib';

@@ -8,6 +8,7 @@
 	$copyParams    = "infoID=$info->id";
 	if(!$info->deleted)
 	{
+		if(common::hasPriv('info', 'edit')) echo html::a('#', $lang->comment, '', 'onclick=setComment()'). ' ';
 		common::printLink('info', 'edit', $params, $lang->info->buttonEdit);
 		//common::printLink('info', 'create', $copyParams, $lang->info->buttonCopy);
 		common::printLink('info', 'delete', $params, $lang->delete, 'hiddenwin');
@@ -23,12 +24,12 @@
 		<?php if($info->digest){?>
 			<fieldset>
 				<legend><?php echo $lang->info->digest;?></legend>
-				<div class='content'><?php echo str_replace('<p>[', '<p class="stepTitle">[', $info->digest);?></div>
+				<div class='content'><?php echo $info->digest;?></div>
 			</fieldset>
 		<?php }?>
 		<fieldset>
 			<legend><?php echo $lang->info->content;?></legend>
-			<div class='content'><?php echo str_replace('<p>[', '<p class="stepTitle">[', $info->content);?></div>
+			<div class='content'><?php echo $info->content;?></div>
 		</fieldset>
 		<?php echo $this->fetch('file', 'printFiles', array('files' => $info->files, 'fieldset' => 'true'));?>
 		<?php include '../../common/view/action.html.php';?>
@@ -36,6 +37,7 @@
 			<?php
 			if(!$info->deleted)
 			{
+				if(common::hasPriv('info', 'edit')) echo html::a('#', $lang->comment, '', 'onclick=setComment()'). ' ';
 				common::printLink('info', 'edit', $params, $lang->info->buttonEdit);
 				//common::printLink('info', 'create', $copyParams, $lang->info->buttonCopy);
 				common::printLink('info', 'delete', $params, $lang->delete, 'hiddenwin');
@@ -43,6 +45,17 @@
 			echo html::a($browseLink, $lang->goback);
 			?>
 		</div>
+		<div id='comment' class='hidden'>
+		<fieldset>
+			<legend><?php echo $lang->comment;?></legend>
+			<form method='post' enctype='multipart/form-data'  action='<?php echo inlink('edit', "infoID=$info->id&comment=true")?>'>
+				<table align='center'>
+					<tr><?php echo html::textarea('comment', '',"rows='5' class='w-p100'");?></tr>
+					<tr><td><?php echo html::submitButton() . html::resetButton();?></td></tr>
+				</table>
+			</form>
+		</fieldset>
+	  </div>
 	</td>
 	<td class='divider'></td>
 	<td class='side'>
@@ -51,7 +64,7 @@
 		<table class='table-1 a-left'>
 			<tr valign='middle'>
 				<th class='rowhead'><?php echo $lang->info->lib;?></th>
-				<td><?php if(!common::printLink('info', 'browse', "libID=$info->lib", $libName)) echo $libName;?>
+				<td><?php if(!common::printLink('info', 'browse', "libID=$info->lib", $libName)) echo $libName;?></td>
 			</tr>
 			<tr>
 				<th class='rowhead'><?php echo $lang->info->module;?></th>

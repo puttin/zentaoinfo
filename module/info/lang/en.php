@@ -6,6 +6,7 @@
  * @package		info
  */
 $lang->info->common				= 'INFO';
+$lang->info->list				= 'Info List';
 $lang->info->module				= 'MODULE';
 $lang->info->welcome				= 'Thanks for using Info plugin! ';
 $lang->info->gotoInfoIndex		= 'Do you want to locate to Info Index?';
@@ -32,7 +33,10 @@ $lang->info->TreeAjaxGetSonModules = 'API: Get son modules';
 
 /* 查询条件列表。*/
 $lang->info->moduleInfos			= 'ByModule';
-$lang->info->allInfos			= 'All Info';
+$lang->info->allInfos			= 'AllInfo';
+$lang->info->createdByMe			= 'CreatedByMe';
+$lang->info->postponed			= 'Postponed';
+$lang->info->mailtome			= 'MailedToMe';
 
 /* 字段列表。*/
 $lang->info->id             = 'Info Id';
@@ -64,20 +68,22 @@ $lang->info->searchInfo = 'Search';
 $lang->info->stickie              = 'Stickie';
 $lang->info->highlight              = 'Highlight';
 
+/* button。*/
 $lang->info->buttonEdit			= 'Edit';
 $lang->info->buttonCopy			= 'Copy';
 
-
+/* prompt。*/
 $lang->info->confirmDelete      = "Are you sure to delete this info?";
 $lang->info->confirmDeleteLib   = " Are you sure to delete this info library?";
 $lang->info->noLib   = " No existed library,please create a info library first!";
 $lang->info->pleaseUpgrade = 'Please contact Admin to upgrade this plugin!';
 
-$lang->info->manageCustomInfo   = 'Manage Info Module';
+$lang->info->manageCustom   = 'Manage Info Module';
 $lang->info->confirmChangeLib = 'Change library will change module also, are you sure?';
 $lang->info->confirmUninstallPlugin   = "Uninstall this plugin will delete all action from TABLE_ACTION so that all infos' history will be LOST! Are you sure you wanna this?";
 $lang->info->pleaseGoToDeletePreuninstall ='Please go to "%s" dir and delete preuninstall.php file before you restart uninstall this plugin.';
 
+/* plugin update*/
 $lang->info->upgradeCommon  = 'Upgrade Plugin';
 $lang->info->upgradeResult  = 'Upgrade Result';
 $lang->info->upgradeFail    = 'Upgrade Fail';
@@ -89,19 +95,17 @@ $lang->info->upgradeFromVersion   = 'From version';
 $lang->info->upgradeToVersion     = 'To version';
 
 $lang->info->upgradeFromVersions['0_1']   = '0.1 or 0.1.1';
+$lang->info->upgradeFromVersions['0_2']   = '0.2';
 
+/* mail to*/
 $lang->info->mailModify ='Modify';
 $lang->info->mailMain ='Content';
 $lang->info->mailto           = 'Mail To';
 $lang->info->lblMailto                   = 'Mail To';
 
-$lang->info->priList[0] = '';
-$lang->info->priList[1] = '1';
-$lang->info->priList[2] = '2';
-$lang->info->priList[3] = '3';
-$lang->info->priList[4] = '4';
 $lang->info->delayWarning        = " <strong class='delayed f-14px'> Postponed %s days </strong>";
 
+/* list*/
 $lang->info->StickieList[0] = '';
 $lang->info->StickieList[1] = '[Top]';
 $lang->info->StickieList[2] = '[Stickie]';
@@ -110,7 +114,14 @@ $lang->info->StickieLable[0] = 'Normal';
 $lang->info->StickieLable[1] = 'Top';
 $lang->info->StickieLable[2] = 'Stickie';
 
+$lang->info->priList[0] = '';
 $lang->info->priList[1] = '1';
 $lang->info->priList[2] = '2';
 $lang->info->priList[3] = '3';
 $lang->info->priList[4] = '4';
+
+/* custom */
+$lang->info->customFields   = 'Custom';
+$lang->info->restoreDefault = 'Default';
+$lang->info->lblAllFields                = 'All Fields';
+$lang->info->lblCustomFields             = 'Custom Fields';
