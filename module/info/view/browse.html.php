@@ -18,7 +18,7 @@ var customed   = <?php echo (int)$customed;?>;
 			}
 			echo "<span id='allTab'>". html::a($this->createLink('info', 'browse', "libID=$libID&moduleID=$moduleID&browseType=all"),$lang->info->allInfos). "</span>";
 		?>
-		<span id='bysearchTab'><a href='#'><?php echo $lang->info->searchInfo;?></a></span>
+		<span id='bysearchTab'><a href='#'><span class='icon-search'></span><?php echo $lang->info->searchInfo;?></a></span>
 	</div>
 	<div class='f-right'>
 	<?php common::printLink('info', 'export', "libID=$libID&orderBy="."Stickie_desc,"."$orderBy", $lang->export, '', 'class="export"'); ?>

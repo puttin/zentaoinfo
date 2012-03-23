@@ -31,6 +31,13 @@ function loadModuleMenu(libID)
     $('#moduleIdBox').load(link);
 }
 
+/**
+ * Load projects of product. 
+ * 
+ * @param  int    $productID 
+ * @access public
+ * @return void
+ */
 function loadProductProjects(productID)
 {
     link = createLink('product', 'ajaxGetProjects', 'productID=' + productID);

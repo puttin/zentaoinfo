@@ -9,4 +9,4 @@ $lang->asset->menu->edit    = '編輯資產庫|asset|editLib|libID=%s&type=asset
 $lang->asset->menu->delete  = array('link' => '刪除資產庫|asset|deleteLib|libID=%s&type=asset', 'target' => 'hiddenwin');
 $lang->asset->menu->module  = array('link' => '維護模塊|info|TreeManage|libID=%s&module=0&type=asset','alias' => 'treemanage');
 $lang->asset->menu->info  = '公告列表|info|browse|';
-$lang->asset->menu->create  = array('link' => '新增資產庫|asset|createLib|type=asset', 'float' => 'right');
+$lang->asset->menu->create  = array('link' => '<span class="icon-add1">&nbsp;</span>新增資產庫|asset|createLib|type=asset', 'float' => 'right');

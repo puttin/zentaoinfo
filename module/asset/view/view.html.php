@@ -77,6 +77,14 @@
 						</td>
 					</tr>
 					<tr>
+						<th class='rowhead w-p20'><?php echo $lang->asset->product;?></th>
+						<td><?php if((!$asset->product) || (!common::printLink('product', 'browse', "productID=$asset->product", $productName))) echo $productName;?></td>
+					</tr>
+					<tr>
+						<th class='rowhead w-p20'><?php echo $lang->asset->project;?></th>
+						<td><?php if((!$asset->product) || (!common::printLink('project', 'browse', "projectID=$asset->project", $projectName))) echo $projectName;?></td>
+					</tr>
+					<tr>
 						<th class='rowhead w-p20'><?php echo $lang->asset->position;?></th>
 						<td> <?php echo $asset->position;?></td>
 					</tr>
@@ -147,7 +155,7 @@
 				</table>
 			</fieldset>
 			<fieldset>
-				<legend><?php echo $lang->asset->legendLendInfo;?></legend>
+				<legend><?php echo $lang->asset->legendOtherInfo;?></legend>
 				<table class='table-1 a-left fixed'>
 					<tr>
 						<th class='rowhead w-p20'><?php echo $lang->asset->from;?></th>
@@ -169,24 +177,22 @@
 						<th class='rowhead w-p20'><?php echo $lang->asset->returndate;?></th>
 						<td> <?php echo $asset->returndate;?></td>
 					</tr>
+					<tr>
+						<th class='rowhead w-p20'><?php echo $lang->asset->use;?></th>
+						<td><?php if($asset->use) echo $asset->use;?></td>
+					</tr>
+					<tr>
+						<th class='rowhead w-p20'><?php echo $lang->asset->lastEditedBy;?></th>
+						<td><?php if($asset->lastEditedBy) echo $users[$asset->lastEditedBy] . $lang->at . $asset->lastEditedDate?></td>
+					</tr>
 				</table>
 			</fieldset>
 		</td>
 	</tr>
 </table>
-<?php if($asset->assetcomment or $asset->use):?>
+<?php if($asset->assetcomment):?>
 <fieldset>
 	<legend><?php echo $lang->asset->legendCommentInfo;?></legend>
-		<table class='table-3 a-left fixed'>
-			<tr>
-				<th class='rowhead w-p20'><?php echo $lang->asset->use;?></th>
-				<td><?php if($asset->use) echo $asset->use;?></td>
-			</tr>
-			<tr>
-				<th class='rowhead w-p20'><?php echo $lang->asset->lastEditedBy;?></th>
-				<td><?php if($asset->lastEditedBy) echo $users[$asset->lastEditedBy] . $lang->at . $asset->lastEditedDate?></td>
-			</tr>
-		</table>
 	<div class='content'><?php echo $asset->assetcomment;?></div>
 </fieldset>
 <?php endif;?>

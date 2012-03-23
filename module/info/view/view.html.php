@@ -21,12 +21,12 @@
 <table class='cont-rt5'>
 	<tr valign='top'>
 	<td>
-		<?php if($info->digest){?>
-			<fieldset>
-				<legend><?php echo $lang->info->digest;?></legend>
-				<div class='content'><?php echo $info->digest;?></div>
-			</fieldset>
-		<?php }?>
+		<?php if($info->digest):?>
+		<fieldset>
+			<legend><?php echo $lang->info->digest;?></legend>
+			<div class='content'><?php echo $info->digest;?></div>
+		</fieldset>
+		<?php endif;?>
 		<fieldset>
 			<legend><?php echo $lang->info->content;?></legend>
 			<div class='content'><?php echo $info->content;?></div>
@@ -98,18 +98,69 @@
 		</table>
 		</fieldset>
 		<fieldset>
-		<legend><?php echo $lang->info->legendLife;?></legend>
-		<table class='table-1 a-left fixed'>
-			<tr>
-			<th class='rowhead w-p20'><?php echo $lang->info->createdBy;?></th>
-			<td> <?php echo $users[$info->createdBy] . $lang->at . $info->createdDate;?></td>
-			</tr>
-			<tr>
-			<th class='rowhead'><?php echo $lang->info->lastEditedBy;?></th>
-			<td><?php if($info->lastEditedBy) echo $users[$info->lastEditedBy] . $lang->at . $info->lastEditedDate?></td>
-			</tr>
-		</table>
+			<legend><?php echo $lang->info->legendLife;?></legend>
+			<table class='table-1 a-left fixed'>
+				<tr>
+					<th class='rowhead w-p20'><?php echo $lang->info->createdBy;?></th>
+					<td> <?php echo $users[$info->createdBy] . $lang->at . $info->createdDate;?></td>
+				</tr>
+				<tr>
+					<th class='rowhead'><?php echo $lang->info->lastEditedBy;?></th>
+					<td><?php if($info->lastEditedBy) echo $users[$info->lastEditedBy] . $lang->at . $info->lastEditedDate?></td>
+				</tr>
+			</table>
 		</fieldset>
+		<?php if($relatedStoryArray):?>
+		<fieldset>
+			<legend><?php echo $lang->info->relatedStory;?></legend>
+			<table class='table-1 a-left fixed'>
+				<tr>
+					<td>
+					<?php
+					foreach($relatedStoryArray as $key => $value)
+					{
+						echo '<span class="nobr">' . html::a($this->createLink('story', 'view', "storyID=$key"), "#$key $value") . '</span><br />';
+					}
+					?>
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+		<?php endif;?>
+		<?php if($relatedTaskArray):?>
+		<fieldset>
+			<legend><?php echo $lang->info->relatedTask;?></legend>
+			<table class='table-1 a-left fixed'>
+				<tr>
+					<td>
+					<?php
+					foreach($relatedTaskArray as $key => $value)
+					{
+						echo '<span class="nobr">' . html::a($this->createLink('task', 'view', "taskID=$key"), "#$key $value") . '</span><br />';
+					}
+					?>
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+		<?php endif;?>
+		<?php if($relatedBugArray):?>
+		<fieldset>
+			<legend><?php echo $lang->info->relatedBug;?></legend>
+			<table class='table-1 a-left fixed'>
+				<tr>
+					<td>
+					<?php
+					foreach($relatedBugArray as $key => $value)
+					{
+						echo '<span class="nobr">' . html::a($this->createLink('bug', 'view', "bugID=$key"), "#$key $value") . '</span><br />';
+					}
+					?>
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+		<?php endif;?>
 	</td>
 	</tr>
 </table>

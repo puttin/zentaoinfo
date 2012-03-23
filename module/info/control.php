@@ -276,6 +276,7 @@ class info extends control
 	}
 	public function view($infoID)
 	{
+		$this->info->addViewedCount($infoID,TABLE_INFO);
 		/* Judge bug exits or not. */
 		$info = $this->info->getInfoById($infoID);
 		if(!$info) die(js::error($this->lang->notFound) . js::locate('back'));
@@ -285,6 +286,16 @@ class info extends control
 		$this->info->setMenu($this->infolibs, $libID, 'info');
 
 		$libName = $this->infolibs[$libID];
+		
+		$relatedStoryStr = str_replace(' ', '', $info->relatedStory);
+		$relatedStoryArray = array();
+		$relatedStoryArray = $this->dao->select('id,title')->from(TABLE_STORY)->where('id')->in($relatedStoryStr)->fetchPairs();
+		$relatedTaskStr = str_replace(' ', '', $info->relatedTask);
+		$relatedTaskArray = array();
+		$relatedTaskArray = $this->dao->select('id,name')->from(TABLE_TASK)->where('id')->in($relatedTaskStr)->fetchPairs();
+		$relatedBugStr = str_replace(' ', '', $info->relatedBug);
+		$relatedBugArray = array();
+		$relatedBugArray = $this->dao->select('id,title')->from(TABLE_BUG)->where('id')->in($relatedBugStr)->fetchPairs();
 
 		/* Header and positon. */
 		$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->view;
@@ -295,6 +306,9 @@ class info extends control
 		$this->view->modulePath  = $this->info->getParents($info->module);
 		$this->view->info        = $info;
 		$this->view->libName     = $libName;
+		$this->view->relatedTaskArray     = $relatedTaskArray;
+		$this->view->relatedStoryArray     = $relatedStoryArray;
+		$this->view->relatedBugArray     = $relatedBugArray;
 		$this->view->users       = $this->user->getPairs('noletter');
 		$this->view->actions     = $this->action->getList('info', $infoID);
 		$this->view->type        = 'info';
@@ -449,6 +463,8 @@ class info extends control
 	}
 	public function upgrade()
 	{
+		$oldInfo = $this->loadModel('extension')->getInfoFromDB('info');
+		$this->version=$oldInfo->version;
 		$this->view->header->title = $this->lang->info->upgradeCommon . $this->lang->colon . $this->lang->info->upgradeSelectVersion;
 		$this->view->position[]    = $this->lang->info->upgradeCommon;
 		$this->display();

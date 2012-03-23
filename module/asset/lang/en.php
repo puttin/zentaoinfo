@@ -22,6 +22,8 @@ $lang->asset->searchInfo			= 'Search';
 $lang->asset->id					= 'ID';
 $lang->asset->lib					= 'Asset Library';
 $lang->asset->module				= 'Module';
+$lang->asset->product				= 'Product';
+$lang->asset->project				= 'Project';
 $lang->asset->createdBy				= 'Created By';
 $lang->asset->createdDate			= 'Created Date';
 $lang->asset->lastEditedBy			= 'LastEdited By';
@@ -67,7 +69,7 @@ $lang->asset->libDefault		= 'Default Asset Library';
 $lang->asset->legendBasicInfo		= 'Basic Info';
 $lang->asset->legendExtendInfo		= 'Extend Info';
 $lang->asset->legendIntrinsicInfo	= 'Intrinsic Info';
-$lang->asset->legendLendInfo		= 'Lend Info';
+$lang->asset->legendOtherInfo		= 'Lend Info';
 $lang->asset->legendCommentInfo		= 'Comment Info';
 
 /* button*/

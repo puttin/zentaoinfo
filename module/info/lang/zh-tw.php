@@ -57,6 +57,7 @@ $lang->info->digest         = '公告摘要';
 $lang->info->legendBasicInfo   = '基本信息';
 $lang->info->legendLife        = '公告的一生';
 $lang->info->editedCount       = '修改次數';
+$lang->info->viewedCount       = '查看次數';
 $lang->info->comment           = '備註';
 $lang->info->deadline           = '過期日期';
 $lang->info->Stickie           = '置頂';
@@ -67,6 +68,9 @@ $lang->info->pri              = '優先級';
 $lang->info->searchInfo = '搜索';
 $lang->info->stickie              = '置頂';
 $lang->info->highlight              = '高亮';
+$lang->info->relatedBug            = '相關Bug';
+$lang->info->relatedStory            = '相關需求';
+$lang->info->relatedTask            = '相關任務';
 
 /* 功能按鈕。*/
 $lang->info->buttonEdit			= '編輯';
@@ -122,7 +126,7 @@ $lang->info->priList[3] = '3';
 $lang->info->priList[4] = '4';
 
 /* 自定義字段 */
-$lang->info->customFields   = '自定義字段';
+$lang->info->customFields   = '自定義顯示';
 $lang->info->restoreDefault = '恢復默認';
 $lang->info->lblAllFields                = '所有字段';
-$lang->info->lblCustomFields             = '自定義字段';
+$lang->info->lblCustomFields             = '自定義顯示';

@@ -17,7 +17,7 @@ var customed   = <?php echo (int)$customed;?>;
 			}
 			echo "<span id='allTab'>". html::a($this->createLink('asset', 'browse', "libID=$libID&moduleID=$moduleID&browseType=all"),$lang->asset->allInfos). "</span>";
 		?>
-		<span id='bysearchTab'><a href='#'><?php echo $lang->asset->searchInfo;?></a></span>
+		<span id='bysearchTab'><a href='#'><span class='icon-search'></span><?php echo $lang->asset->searchInfo;?></a></span>
 	</div>
 	<div class='f-right'>
 	<?php common::printLink('asset', 'export', "libID=$libID&orderBy=$orderBy", $lang->export, '', 'class="export"'); ?>

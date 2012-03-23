@@ -175,14 +175,23 @@ class asset extends control{
 	}
 	public function view($assetID)
 	{
+		$this->info->addViewedCount($assetID,TABLE_INFOASSET);
 		$asset = $this->asset->getAssetById($assetID);
 		if(!$asset) die(js::error($this->lang->notFound) . js::locate('back'));
 
+		$products = array('0'=>'')+$this->loadModel('product')->getPairs();
+		$projects = array('0'=>'');
+		if ($asset->product != '0'){
+			$projects += $this->loadModel('product')->getProjectPairs($asset->product);
+		}
+		
 		/* Set menu. */
 		$libID=$asset->lib;
 		$this->info->setMenu($this->assetlibs, $libID, 'asset');
 
 		$libName = $this->assetlibs[$libID];
+		$productName=$products[$asset->product];
+		$projectName=$projects[$asset->project];
 
 		/* Header and positon. */
 		$this->view->header->title = $this->assetlibs[$libID] . $this->lang->colon . $this->lang->asset->view;
@@ -195,6 +204,8 @@ class asset extends control{
 		$this->view->moduleID    = $asset->module;
 		$this->view->libID       = $libID;
 		$this->view->libName     = $libName;
+		$this->view->productName = $productName;
+		$this->view->projectName = $projectName;
 		$this->view->type        = 'asset';
 		$this->view->users       = $this->user->getPairs('noletter');
 		$this->view->actions     = $this->action->getList('asset', $assetID);
@@ -251,6 +262,8 @@ class asset extends control{
 		$returndate     = '0000-00-00';
 		$assetcomment   = '';
 		$use            = '';
+		$product        = '0';
+		$project        = '0';
 		
 		/* Parse the extras. */
 		$extras = str_replace(array(',', ' '), array('&', ''), $extras);
@@ -290,16 +303,26 @@ class asset extends control{
 			$returndate     = $asset->returndate;
 			$assetcomment   = $asset->assetcomment;
 			$use            = $asset->use;
+			$product        = $asset->$product;
+			$project        = $asset->$project;
 		}
 		
 		/* Get the modules. */
 		$moduleOptionMenu = $this->info->getOptionMenu($libID, 'asset', $startModuleID = 0);
+		$products = array(''=>'')+$this->loadModel('product')->getPairs();
+		$projects = array();
+		if ($product != '0'){
+			$projects += $this->loadModel('product')->getProjectPairs($product);
+		}
 
 		$this->view->header->title = $this->assetlibs[$libID] . $this->lang->colon . $this->lang->asset->create;
 		$this->view->position[]    = $this->lang->asset->create;
 
 		/* Init vars. */
-		$this->view->users = $this->user->getPairs('nodeleted');
+		$this->view->products   = $products;
+		$this->view->projects   = $projects;
+		
+		$this->view->users            = $this->user->getPairs('nodeleted');
 		$this->view->libID            = $libID;
 		$this->view->libs             = $this->info->getLibPairs($params = 'nodeleted','asset');
 		$this->view->moduleOptionMenu = $moduleOptionMenu;
@@ -335,6 +358,8 @@ class asset extends control{
 		$this->view->returndate       = $returndate;
 		$this->view->assetcomment     = $assetcomment;
 		$this->view->use              = $use;
+		$this->view->product          = $product;
+		$this->view->project          = $project;
 
 		$this->display();
 	}
@@ -361,6 +386,11 @@ class asset extends control{
 
 		/* Set the menu. */
 		$this->info->setMenu($this->assetlibs, $libID,'asset');
+		$products = array(''=>'')+$this->loadModel('product')->getPairs();
+		$projects = array();
+		if ($asset->product != '0'){
+			$projects += $this->loadModel('product')->getProjectPairs($asset->product);
+		}
 
 		/* Set header and position. */
 		$this->view->header->title = $this->assetlibs[$libID] . $this->lang->colon . $this->lang->asset->edit;
@@ -368,6 +398,8 @@ class asset extends control{
 		$this->view->position[]    = $this->lang->asset->edit;
 
 		/* Assign. */
+		$this->view->products   = $products;
+		$this->view->projects   = $projects;
 		$this->view->asset            = $asset;
 		$this->view->libID            = $libID;
 		$this->view->moduleOptionMenu = $this->info->getOptionMenu($libID,'asset', $startModuleID = 0);

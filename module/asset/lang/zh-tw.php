@@ -22,6 +22,8 @@ $lang->asset->searchInfo			= '搜索';
 $lang->asset->id					= 'ID';
 $lang->asset->lib					= '資產庫';
 $lang->asset->module				= '所屬分類';
+$lang->asset->product				= '相關產品';
+$lang->asset->project				= '相關項目';
 $lang->asset->createdBy				= '有誰創建';
 $lang->asset->createdDate			= '創建日期';
 $lang->asset->lastEditedBy			= '最後修改';
@@ -67,7 +69,7 @@ $lang->asset->libDefault        = '默認資產庫';
 $lang->asset->legendBasicInfo		= '基本信息';
 $lang->asset->legendExtendInfo		= '擴展信息';
 $lang->asset->legendIntrinsicInfo	= '固有信息';
-$lang->asset->legendLendInfo		= '來去信息';
+$lang->asset->legendOtherInfo		= '其他信息';
 $lang->asset->legendCommentInfo		= '備註信息';
 
 /* 功能按钮。*/

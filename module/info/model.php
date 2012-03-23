@@ -516,9 +516,11 @@ class infoModel extends model
 		if($fromVersion == '0_1'){
 			$this->upgradeFrom0_1To0_2();
 			$this->upgradeFrom0_2To0_3();
+			$this->upgradeFrom0_3To0_3_1();
 		}
 		elseif ($fromVersion == '0_2'){
 			$this->upgradeFrom0_2To0_3();
+			$this->upgradeFrom0_3To0_3_1();
 		}
 		elseif ($fromVersion == '0_3'){
 			$this->upgradeFrom0_3To0_3_1();
@@ -560,7 +562,7 @@ class infoModel extends model
             }
         }
     }
-	private function getUpgradeFile($version)
+	public function getUpgradeFile($version)
     {
         return $this->app->getModuleExtPath('extension','info') . 'db' . $this->app->getPathFix() . 'update' . $version . '.sql';
     }

@@ -97,7 +97,34 @@ confirmChangeLib   = '<?php echo $lang->info->confirmChangeLib;?>';
 						</tr>
 						<tr>
 							<td class='rowhead'><?php echo $lang->info->pri;?></td>
-							<td><?php echo html::select('pri', $lang->info->priList, $info->pri, 'class=select-1');?>
+							<td><?php echo html::select('pri', $lang->info->priList, $info->pri, 'class=select-1');?></td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset>
+					<legend><?php echo $lang->info->relatedStory;?></legend>
+					<table class='table-1 a-left fixed'>
+						<tr>
+							<td class='rowhead w-p20'><?php echo $lang->info->relatedStory;?></td>
+							<td><?php echo html::input('relatedStory', $info->relatedStory, 'class=text-3');?> </td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset>
+					<legend><?php echo $lang->info->relatedTask;?></legend>
+					<table class='table-1 a-left fixed'>
+						<tr>
+							<td class='rowhead w-p20'><?php echo $lang->info->relatedTask;?></td>
+							<td><?php echo html::input('relatedTask', $info->relatedTask, 'class=text-3');?> </td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset>
+					<legend><?php echo $lang->info->relatedBug;?></legend>
+					<table class='table-1 a-left fixed'>
+						<tr>
+							<td class='rowhead w-p20'><?php echo $lang->info->relatedBug;?></td>
+							<td><?php echo html::input('relatedBug', $info->relatedBug, 'class=text-3');?> </td>
 						</tr>
 					</table>
 				</fieldset>

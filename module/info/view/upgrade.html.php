@@ -8,7 +8,7 @@
     </tr>
     <tr>
       <th class='w-p20 rowhead'><?php echo $lang->info->upgradeToVersion;?></th>
-      <td><?php echo $config->infoVersion;?></td>
+      <td><?php echo $oldInfo;?></td>
     </tr>
     <tr>
       <td colspan='2' class='a-center'><?php echo html::submitButton($lang->info->upgradeCommon);?></td>

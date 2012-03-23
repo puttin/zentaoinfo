@@ -57,6 +57,7 @@ $lang->info->digest         = 'Digest';
 $lang->info->legendBasicInfo   = 'Basic Info';
 $lang->info->legendLife        = 'Lifetime';
 $lang->info->editedCount       = 'Edit Times';
+$lang->info->viewedCount       = 'View Times';
 $lang->info->comment           = 'Comment';
 $lang->info->deadline           = 'Deadline';
 $lang->info->Stickie           = 'Stickie';
@@ -67,6 +68,9 @@ $lang->info->pri              = 'Priority';
 $lang->info->searchInfo = 'Search';
 $lang->info->stickie              = 'Stickie';
 $lang->info->highlight              = 'Highlight';
+$lang->info->relatedBug            = 'Related Bug';
+$lang->info->relatedStory            = 'Story';
+$lang->info->relatedTask            = 'Task';
 
 /* button。*/
 $lang->info->buttonEdit			= 'Edit';
@@ -125,4 +129,4 @@ $lang->info->priList[4] = '4';
 $lang->info->customFields   = 'Custom';
 $lang->info->restoreDefault = 'Default';
 $lang->info->lblAllFields                = 'All Fields';
-$lang->info->lblCustomFields             = 'Custom Fields';
+$lang->info->lblCustomFields             = 'Custom';

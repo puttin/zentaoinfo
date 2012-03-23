@@ -11,4 +11,4 @@ $lang->info->menu->delete  = array('link' => 'Delete Library|info|deleteLib|libI
 $lang->info->menu->module  = array('link' => 'Module|info|TreeManage|libID=%s','alias' => 'treemanage');
 $lang->info->menu->asset  = 'Asset|asset|browse|';
 $lang->info->menu->upgrade  = 'Upgrade Plugin|info|upgrade|';
-$lang->info->menu->create  = array('link' => 'New Library|info|createLib', 'float' => 'right');
+$lang->info->menu->create  = array('link' => '<span class="icon-add1">&nbsp;</span>New Library|info|createLib', 'float' => 'right');

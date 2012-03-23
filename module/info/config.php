@@ -25,6 +25,8 @@ $config->info->search['fields']['lastEditedBy']   = $lang->info->lastEditedBy;
 $config->info->search['fields']['lastEditedDate'] = $lang->info->lastEditedDate;
 $config->info->search['fields']['keywords']       = $lang->info->keywords;
 $config->info->search['fields']['digest']         = $lang->info->digest;
+$config->info->search['fields']['editedCount']    = $lang->info->editedCount;
+$config->info->search['fields']['viewedCount']    = $lang->info->viewedCount;
 
 $config->info->search['params']['title']          = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->info->search['params']['keywords']       = array('operator' => 'include', 'control' => 'input',  'values' => '');
@@ -36,3 +38,5 @@ $config->info->search['params']['createdBy']      = array('operator' => '=',    
 $config->info->search['params']['createdDate']    = array('operator' => '>=',      'control' => 'input',  'values' => '');
 $config->info->search['params']['lastEditedBy']   = array('operator' => '=',       'control' => 'select', 'values' => 'users');
 $config->info->search['params']['lastEditedDate'] = array('operator' => '>=',      'control' => 'input',  'values' => '');
+$config->info->search['params']['viewedCount']    = array('operator' => '>=',      'control' => 'input',  'values' => '0');
+$config->info->search['params']['editedCount']    = array('operator' => '=',      'control' => 'input',  'values' => '0');
