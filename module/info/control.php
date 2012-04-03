@@ -208,6 +208,17 @@ class info extends control
 
 		$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->create;
 		$this->view->position[]    = $this->lang->info->create;
+		
+		/* Custom Field */
+		$customs=$this->app->dbh->query("SHOW FULL COLUMNS FROM  `".TABLE_INFO."` like 'custom_%'")->fetchAll(PDO::FETCH_OBJ);
+		foreach($customs as $custom) {
+			if (strpos($custom->Type,'(')!==false)
+				$custom->Length= substr($custom->Type,strpos($custom->Type,'(')+1,strpos($custom->Type,')')-strpos($custom->Type,'(')-1);
+			else
+				$custom->Length = 0;
+			$custom->Type = strtoupper(substr($custom->Type,0,strpos($custom->Type,'(')));
+		}
+		$this->view->customs          = $customs;
 
 		/* Init vars. */
 		$mailto     = '';
@@ -248,6 +259,17 @@ class info extends control
 		$libID = $info->lib;
 		$this->info->setMenu($this->infolibs, $libID);
 
+		/* Custom Field */
+		$customs=$this->app->dbh->query("SHOW FULL COLUMNS FROM  `".TABLE_INFO."` like 'custom_%'")->fetchAll(PDO::FETCH_OBJ);
+		foreach($customs as $custom) {
+			if (strpos($custom->Type,'(')!==false)
+				$custom->Length= substr($custom->Type,strpos($custom->Type,'(')+1,strpos($custom->Type,')')-strpos($custom->Type,'(')-1);
+			else
+				$custom->Length = 0;
+			$custom->Type = strtoupper(substr($custom->Type,0,strpos($custom->Type,'(')));
+		}
+		$this->view->customs          = $customs;
+		
 		/* Get modules. */
 		$moduleOptionMenu = $this->info->getOptionMenu($libID, 'info', $startModuleID = 0);
 		$this->view->users            = $this->user->appendDeleted($this->user->getPairs('nodeleted'), "$info->mailto");
@@ -296,6 +318,9 @@ class info extends control
 		$relatedBugStr = str_replace(' ', '', $info->relatedBug);
 		$relatedBugArray = array();
 		$relatedBugArray = $this->dao->select('id,title')->from(TABLE_BUG)->where('id')->in($relatedBugStr)->fetchPairs();
+		
+		$customs=$this->app->dbh->query("SHOW FULL COLUMNS FROM  `".TABLE_INFO."` like 'custom_%'")->fetchAll(PDO::FETCH_OBJ);
+		//var_dump($customs);
 
 		/* Header and positon. */
 		$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->view;
@@ -311,6 +336,7 @@ class info extends control
 		$this->view->relatedBugArray     = $relatedBugArray;
 		$this->view->users       = $this->user->getPairs('noletter');
 		$this->view->actions     = $this->action->getList('info', $infoID);
+		$this->view->customs     = $customs;
 		$this->view->type        = 'info';
 
 		$this->display();
@@ -383,7 +409,6 @@ class info extends control
 		$lib = $this->loadModel('info')->getLibById($rootID);
 		$this->view->root = $lib;
 		$this->info->setMenu($this->info->getLibs($type), $rootID, $type);
-		$this->lang->set('menugroup.tree', $type);
 		$this->lang->info->menu = $this->lang->$type->menu;
 		
 		$header['title'] = $this->lang->$type->manageCustom . $this->lang->colon . $lib->name;

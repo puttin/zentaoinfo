@@ -197,6 +197,10 @@ class asset extends control{
 		$this->view->header->title = $this->assetlibs[$libID] . $this->lang->colon . $this->lang->asset->view;
 		$this->view->position[]    = html::a($this->createLink('asset', 'browse', "libID=$libID"), $libName);
 		$this->view->position[]    = $this->lang->asset->view;
+		
+		/* Custom Field */
+		$customs=$this->app->dbh->query("SHOW FULL COLUMNS FROM  `".TABLE_INFOASSET."` like 'custom_%'")->fetchAll(PDO::FETCH_OBJ);
+		$this->view->customs          = $customs;
 
 		/* Assign. */
 		$this->view->modulePath  = $this->info->getParents($asset->module);
@@ -265,6 +269,18 @@ class asset extends control{
 		$product        = '0';
 		$project        = '0';
 		
+		/* Custom Field */
+		$customs=$this->app->dbh->query("SHOW FULL COLUMNS FROM  `".TABLE_INFOASSET."` like 'custom_%'")->fetchAll(PDO::FETCH_OBJ);
+		foreach($customs as $custom) {
+			if (strpos($custom->Type,'(')!==false)
+				$custom->Length= substr($custom->Type,strpos($custom->Type,'(')+1,strpos($custom->Type,')')-strpos($custom->Type,'(')-1);
+			else
+				$custom->Length = 0;
+			$custom->Type = strtoupper(substr($custom->Type,0,strpos($custom->Type,'(')));
+			${$custom->Field} = $custom->Default;
+		}
+		$this->view->customs          = $customs;
+		
 		/* Parse the extras. */
 		$extras = str_replace(array(',', ' '), array('&', ''), $extras);
 		parse_str($extras);
@@ -303,8 +319,11 @@ class asset extends control{
 			$returndate     = $asset->returndate;
 			$assetcomment   = $asset->assetcomment;
 			$use            = $asset->use;
-			$product        = $asset->$product;
-			$project        = $asset->$project;
+			$product        = $asset->product;
+			$project        = $asset->project;
+			foreach($customs as $custom) {
+				${$custom->Field} = $asset->{$custom->Field};
+			}
 		}
 		
 		/* Get the modules. */
@@ -360,6 +379,9 @@ class asset extends control{
 		$this->view->use              = $use;
 		$this->view->product          = $product;
 		$this->view->project          = $project;
+		foreach($customs as $custom) {
+			$this->view->{$custom->Field} = ${$custom->Field};
+		}
 
 		$this->display();
 	}
@@ -384,6 +406,17 @@ class asset extends control{
 		$libID       = $asset->lib;
 		$currentModuleID = $asset->module;
 
+		/* Custom Field */
+		$customs=$this->app->dbh->query("SHOW FULL COLUMNS FROM  `".TABLE_INFOASSET."` like 'custom_%'")->fetchAll(PDO::FETCH_OBJ);
+		foreach($customs as $custom) {
+			if (strpos($custom->Type,'(')!==false)
+				$custom->Length= substr($custom->Type,strpos($custom->Type,'(')+1,strpos($custom->Type,')')-strpos($custom->Type,'(')-1);
+			else
+				$custom->Length = 0;
+			$custom->Type = strtoupper(substr($custom->Type,0,strpos($custom->Type,'(')));
+		}
+		$this->view->customs          = $customs;
+		
 		/* Set the menu. */
 		$this->info->setMenu($this->assetlibs, $libID,'asset');
 		$products = array(''=>'')+$this->loadModel('product')->getPairs();

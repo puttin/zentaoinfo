@@ -55,6 +55,7 @@ $lang->info->keywords       = 'Keywords';
 $lang->info->files          = 'File';
 $lang->info->digest         = 'Digest';
 $lang->info->legendBasicInfo   = 'Basic Info';
+$lang->info->legendCustomInfo		= 'Custom Info';
 $lang->info->legendLife        = 'Lifetime';
 $lang->info->editedCount       = 'Edit Times';
 $lang->info->viewedCount       = 'View Times';

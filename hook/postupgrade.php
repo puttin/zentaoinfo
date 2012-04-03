@@ -8,7 +8,7 @@
 						'0.2'	=>'desc '.$prefix."info 'mailto'",
 						'0.3'	=>'desc '.$prefix."infolib 'type'",
 						'0.3.1'	=>'desc '.$prefix."infoasset 'use'",
-						'0.3.5'	=>'desc '.$prefix."infoasset 'product'",
+						'0.3.6'	=>'desc '.$prefix."infoasset 'product'",
 						);
 	foreach ($versionChecks as $key => $checkStr){
 		$test=$this->app->dbh->query($checkStr)->fetch(PDO::FETCH_OBJ);

@@ -10,5 +10,5 @@ $lang->info->menu->edit    = '編輯公告庫|info|editLib|libID=%s';
 $lang->info->menu->delete  = array('link' => '刪除公告庫|info|deleteLib|libID=%s', 'target' => 'hiddenwin');
 $lang->info->menu->module  = array('link' => '維護模塊|info|TreeManage|libID=%s','alias' => 'treemanage');
 $lang->info->menu->asset  = '資產列表|asset|browse|';
-$lang->info->menu->upgrade  = '升級插件|info|upgrade|';
+//$lang->info->menu->upgrade  = '升級插件|info|upgrade|';
 $lang->info->menu->create  = array('link' => '<span class="icon-add1">&nbsp;</span>新增公告庫|info|createLib', 'float' => 'right');

@@ -161,6 +161,19 @@
 			</table>
 		</fieldset>
 		<?php endif;?>
+		<?php if(!empty($customs)):?>
+		<fieldset>
+			<legend><?php echo $lang->info->legendCustomInfo;?></legend>
+			<table class='table-1 a-left fixed'>
+				<?php foreach($customs as $custom):?>
+				<tr>
+					<th class='rowhead w-p20'><?php echo $custom->Comment;?></th>
+					<td> <?php echo $info->{$custom->Field};?></td>
+				</tr>
+				<?php endforeach;?>
+			</table>
+		</fieldset>
+		<?php endif;?>
 	</td>
 	</tr>
 </table>

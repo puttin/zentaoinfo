@@ -30,8 +30,6 @@ releases:              # Release versions.
       2.user custom field
       3.add field 'project' to Asset module
       4.add field 'relatedStory','relatedTask','relatedBug' to Info module
-      5.add function Favorites
-      6.add function Remind
   0.3.1:                
     zentaoversion:2.4 
     charge:free       

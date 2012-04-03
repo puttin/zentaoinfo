@@ -189,6 +189,23 @@
 			</fieldset>
 		</td>
 	</tr>
+	<tr>
+		<td colspan='3'>
+			<?php if(!empty($customs)):?>
+			<fieldset>
+				<legend><?php echo $lang->asset->legendCustomInfo;?></legend>
+				<table class='table-1 a-left fixed'>
+					<?php foreach($customs as $custom):?>
+					<tr>
+						<th class='rowhead w-p20'><?php echo $custom->Comment;?></th>
+						<td> <?php echo $asset->{$custom->Field};?></td>
+					</tr>
+					<?php endforeach;?>
+				</table>
+			</fieldset>
+			<?php endif;?>
+		</td>
+	</tr>
 </table>
 <?php if($asset->assetcomment):?>
 <fieldset>

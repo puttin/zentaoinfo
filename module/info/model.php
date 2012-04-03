@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class infoModel extends model
 {
     static $errors = array();
@@ -23,6 +23,8 @@ class infoModel extends model
 	}
 	public function createInfo()
 	{
+		$skipFields = '';
+		$skipFields .= $this->loadModel('custom')->dealWithCustomArrayField();
 		$now = helper::now();
 		$info = fixer::input('post')
 			->add('createdBy', $this->app->user->account)
@@ -37,7 +39,7 @@ class infoModel extends model
 		$condition = "module = '$info->module'";
 		$this->dao->insert(TABLE_INFO)
 			->data($info)
-			->autoCheck()
+			->autoCheck($skipFields)
 			->batchCheck($this->config->info->create->requiredFields, 'notempty')
 			->check('title', 'unique', $condition)
 			->exec();
@@ -293,6 +295,8 @@ class infoModel extends model
 	}
 	public function update($infoID)
 	{
+		$skipFields = '';
+		$skipFields .= $this->loadModel('custom')->dealWithCustomArrayField();
 		$oldInfo = $this->getInfoById($infoID);
 		$now = helper::now();
 		$info = fixer::input('post')
@@ -305,14 +309,18 @@ class infoModel extends model
 			->add('lastEditedBy',$this->app->user->account)
 			->add('lastEditedDate',$now)
 			->get();
-
+//		ob_start();
+//		var_dump($info);
+//		$result = ob_get_clean();
+//		echo js::alert($result);
 		$condition = "lib = '$info->lib' AND module = '$info->module' AND id != '$infoID'";
 		$this->dao->update(TABLE_INFO)->data($info)
-			->autoCheck()
+			->autoCheck($skipFields)
 			->batchCheck($this->config->info->edit->requiredFields, 'notempty')
 			->check('title', 'unique', $condition)
 			->where('id')->eq((int)$infoID)
 			->exec();
+		echo js::alert('1');
 		$info->editedCount=$info->editedCount-1;
 		if(!dao::isError()) return common::createChanges($oldInfo, $info);
 	}

@@ -71,6 +71,7 @@ $lang->asset->legendExtendInfo		= '擴展信息';
 $lang->asset->legendIntrinsicInfo	= '固有信息';
 $lang->asset->legendOtherInfo		= '其他信息';
 $lang->asset->legendCommentInfo		= '備註信息';
+$lang->asset->legendCustomInfo		= '自定義信息';
 
 /* 功能按钮。*/
 $lang->asset->buttonEdit			= '編輯';

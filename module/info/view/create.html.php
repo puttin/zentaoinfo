@@ -9,7 +9,6 @@ userList = "<?php echo join(',', array_keys($users));?>".split(',');
 	<div id='titlebar'>
 		<div id='main'>
 			<?php echo $lang->info->create;?>
-			<?php echo html::input('title', '', "class='text-1'");?>
 		</div>
 		<div><?php echo html::submitButton()?></div>
 	</div>
@@ -38,6 +37,41 @@ userList = "<?php echo join(',', array_keys($users));?>".split(',');
 						<td><?php echo $this->fetch('file', 'buildform', 'fileCount=2');?></td>
 					</tr>
 				</table>
+				<?php if(!empty($customs)):?>
+				<fieldset>
+					<legend><?php echo $lang->info->legendCustomInfo;?></legend>
+					<table class='table-1'>
+						<?php foreach($customs as $custom):?>
+						<tr>
+							<th class='rowhead'><?php echo $custom->Comment;?></th>
+							<td>
+								<?php if(preg_match('@^(TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT|VARCHAR|CHAR)$@i', $custom->Type)):?>
+								<?php echo html::textarea($custom->Field, $custom->Default, "class='area-1' rows=3");?>
+								<?php elseif(preg_match('@^(ENUM|SET)$@i', $custom->Type)):?>
+								<?php 
+									$selectOptions=explode(',',$custom->Length);
+									foreach($selectOptions as $key => $value) {
+										$value = trim($value,"'");
+										$selectOptions[$value]=$value;
+										unset($selectOptions[$key]);
+									}
+									unset($value);
+									if (preg_match('@^(SET)$@i', $custom->Type)) {
+										echo html::select($custom->Field.'[]', $selectOptions, $custom->Default, "class='select-3' multiple");
+									}
+									else {
+										echo html::select($custom->Field, $selectOptions, $custom->Default, "class='select-3'");
+									}
+								?>
+								<?php else:?>
+								<?php echo html::input($custom->Field, $custom->Default, "class='text-1'");?>
+								<?php endif;?>
+							</td>
+						</tr>
+						<?php endforeach;?>
+					</table>
+				</fieldset>
+				<?php endif;?>
 				<div class='a-center' style='font-size:16px; font-weight:bold'>
 					<?php
 					$browseLink = $app->session->infoList != false ? $app->session->infoList : inlink('browse', "libID=$libID");

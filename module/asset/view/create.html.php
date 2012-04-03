@@ -173,6 +173,41 @@ confirmChangeLib   = '<?php echo $lang->asset->confirmChangeLib;?>';
 		<legend><?php echo $lang->asset->legendCommentInfo;?></legend>
 		<?php echo html::textarea('assetcomment', $assetcomment, "class='area-1'");?>
 	</fieldset>
+	<?php if(!empty($customs)):?>
+	<fieldset>
+		<legend><?php echo $lang->asset->legendCustomInfo;?></legend>
+		<table class='table-1'>
+			<?php foreach($customs as $custom):?>
+			<tr>
+				<th class='rowhead'><?php echo $custom->Comment;?></th>
+				<td>
+					<?php if(preg_match('@^(TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT|VARCHAR|CHAR)$@i', $custom->Type)):?>
+					<?php echo html::textarea($custom->Field, ${$custom->Field}, "class='area-1' rows=3");?>
+					<?php elseif(preg_match('@^(ENUM|SET)$@i', $custom->Type)):?>
+					<?php 
+						$selectOptions=explode(',',$custom->Length);
+						foreach($selectOptions as $key => $value) {
+							$value = trim($value,"'");
+							$selectOptions[$value]=$value;
+							unset($selectOptions[$key]);
+						}
+						unset($value);
+						if (preg_match('@^(SET)$@i', $custom->Type)) {
+							echo html::select($custom->Field.'[]', $selectOptions, ${$custom->Field}, "class='select-3' multiple");
+						}
+						else {
+							echo html::select($custom->Field, $selectOptions, ${$custom->Field}, "class='select-3'");
+						}
+					?>
+					<?php else:?>
+					<?php echo html::input($custom->Field, ${$custom->Field}, "class='text-1'");?>
+					<?php endif;?>
+				</td>
+			</tr>
+			<?php endforeach;?>
+		</table>
+	</fieldset>
+	<?php endif;?>
 	<div class='a-center' style='font-size:16px; font-weight:bold'>
 		<?php
 		$browseLink = $app->session->assetList != false ? $app->session->assetList : inlink('browse', "libID=$libID");

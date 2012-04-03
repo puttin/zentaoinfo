@@ -71,6 +71,7 @@ $lang->asset->legendExtendInfo		= 'Extend Info';
 $lang->asset->legendIntrinsicInfo	= 'Intrinsic Info';
 $lang->asset->legendOtherInfo		= 'Lend Info';
 $lang->asset->legendCommentInfo		= 'Comment Info';
+$lang->asset->legendCustomInfo		= 'Custom Info';
 
 /* button*/
 $lang->asset->buttonEdit			= 'Edit';

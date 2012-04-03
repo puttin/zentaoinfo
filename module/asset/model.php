@@ -21,6 +21,8 @@ class assetModel extends model{
 	}
 	public function createAsset()
 	{
+		$skipFields = '';
+		$skipFields .= $this->loadModel('custom')->dealWithCustomArrayField();
 		$now = helper::now();
 		$today = helper::today();
 		$address=fixer::input('post')->get('address');
@@ -65,7 +67,7 @@ class assetModel extends model{
 		$conditionextaddress = $condition." and extendaddress != 'IP Format Error' and extendaddress != 'Conflict!'";
 		$this->dao->insert(TABLE_INFOASSET)
 			->data($asset)
-			->autoCheck()
+			->autoCheck($skipFields)
 			->batchCheck($this->config->asset->create->requiredFields, 'notempty')
 			->check('hostname', 'unique', $condition)
 			->checkIF(!(strlen(trim($address))==0),'address', 'unique', $conditionaddress)
@@ -85,7 +87,9 @@ class assetModel extends model{
 		$linkHtml = html::a(helper::createLink('asset', 'browse', "libID={$module->root}&&moduleID={$module->id}"), $module->name, '_self', "id='module{$module->id}'");
 		return $linkHtml;
 	}
-	public function update($assetID){
+	public function update($assetID) {
+		$skipFields = '';
+		$skipFields .= $this->loadModel('custom')->dealWithCustomArrayField();
 		$oldAsset = $this->getAssetById($assetID);
 		$now = helper::now();
 		$address=fixer::input('post')->get('address');
@@ -126,7 +130,7 @@ class assetModel extends model{
 		$conditionaddress = $condition." and address != 'IP Format Error' and address != 'Conflict!'";
 		$conditionextaddress = $condition." and extendaddress != 'IP Format Error' and extendaddress != 'Conflict!'";
 		$this->dao->update(TABLE_INFOASSET)->data($asset)
-			->autoCheck()
+			->autoCheck($skipFields)
 			->batchCheck($this->config->asset->edit->requiredFields, 'notempty')
 			->check('hostname', 'unique', $condition)
 			->checkIF(!(strlen(trim($address))==0),'address', 'unique', $conditionaddress)

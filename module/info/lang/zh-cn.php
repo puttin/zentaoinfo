@@ -1,10 +1,4 @@
 <?php
-/**
- * The install module zh-cn file of ZenTaoPMS.
- *
- * @author		Yanzhi Wang
- * @package		info
- */
 $lang->info->common				= '信息公告';
 $lang->info->list				= '公告列表';
 $lang->info->module				= '模块';
@@ -56,6 +50,7 @@ $lang->info->files          = '附件';
 $lang->info->digest         = '公告摘要';
 $lang->info->legendBasicInfo   = '基本信息';
 $lang->info->legendLife        = '公告的一生';
+$lang->info->legendCustomInfo		= '自定义信息';
 $lang->info->editedCount       = '修改次数';
 $lang->info->viewedCount       = '查看次数';
 $lang->info->comment           = '备注';

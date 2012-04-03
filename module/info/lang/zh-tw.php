@@ -56,6 +56,7 @@ $lang->info->files          = '附件';
 $lang->info->digest         = '公告摘要';
 $lang->info->legendBasicInfo   = '基本信息';
 $lang->info->legendLife        = '公告的一生';
+$lang->info->legendCustomInfo		= '自定義信息';
 $lang->info->editedCount       = '修改次數';
 $lang->info->viewedCount       = '查看次數';
 $lang->info->comment           = '備註';
