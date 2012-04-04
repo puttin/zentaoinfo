@@ -22,6 +22,11 @@ class asset extends control{
 		{
 			$libID=$this->info->getDefaultLibId('asset');
 		}
+		if ($libID===false) {
+			//there is no default lib
+			$libName = '';
+		}
+		else
 		$libName = $this->assetlibs[$libID];
 
 		/* Set menu, save session. */
@@ -154,7 +159,7 @@ class asset extends control{
 		$users = $this->user->getPairs('noletter');
 		if ($browseType == 'all') $this->view->header->title = $this->lang->asset->index;
 		else{
-			$this->view->header->title = $this->assetlibs[$libID] . $this->lang->colon . $this->lang->asset->index;
+			$this->view->header->title = $libName . $this->lang->colon . $this->lang->asset->index;
 			$this->view->position[]    = html::a($this->createLink('asset', 'browse', "libID=$libID"), $libName);
 		}
 		$this->view->position[]    = $this->lang->asset->list;

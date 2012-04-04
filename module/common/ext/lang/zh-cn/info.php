@@ -12,3 +12,4 @@ $lang->info->menu->module  = array('link' => '维护模块|info|TreeManage|libID
 $lang->info->menu->asset  = '资产列表|asset|browse|';
 //$lang->info->menu->upgrade  = '升级插件|info|upgrade|';
 $lang->info->menu->create  = array('link' => '<span class="icon-add1">&nbsp;</span>新增公告库|info|createLib', 'float' => 'right');
+$lang->info->menu->cleanInfoDatabase  = 'cleanInfoDatabase|info|cleanInfoDatabase|';

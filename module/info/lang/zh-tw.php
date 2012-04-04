@@ -88,6 +88,9 @@ $lang->info->confirmChangeLib   = '修改公告庫會導致相應的分類變化
 $lang->info->confirmUninstallPlugin   = '卸載禪道信息公告插件會刪除所有該插件的動態信息,造成之後再次使用時,所有公告歷史記錄消失!您確認卸載嗎?';
 $lang->info->pleaseGoToDeletePreuninstall ='請前往 "%s" 目錄刪除 preuninstall.php 文件後再重新卸載.';
 
+
+$lang->info->confirmcleanInfoDatabase      = "Are you sure you want to clean all database related to this plugin?";
+$lang->info->confirmcleanInfoDatabaseAgain      = "Once Again!ARE YOU SURE YOU WANT TO CLEAN ALL DATABASE RELATED TO THIS PLUGIN?";
 /* 插件升級。*/
 $lang->info->upgradeCommon  = '升級插件';
 $lang->info->upgradeResult  = '升級結果';

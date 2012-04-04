@@ -26,7 +26,12 @@ class info extends control
 //		if (!$libID){
 //			$browseType = 'all';
 //		}
-		$libName = $this->infolibs[$libID];
+		if ($libID===false) {
+			//there is no default lib
+			$libName = '';
+		}
+		else
+			$libName = $this->infolibs[$libID];
 
 		/* Set menu, save session. */
 		$this->info->setMenu($this->infolibs, $libID,'info');
@@ -163,7 +168,7 @@ class info extends control
 		$users = $this->user->getPairs('noletter');
 		if ($browseType == 'all') $this->view->header->title = $this->lang->info->index;
 		else{
-			$this->view->header->title = $this->infolibs[$libID] . $this->lang->colon . $this->lang->info->index;
+			$this->view->header->title = $libName . $this->lang->colon . $this->lang->info->index;
 			$this->view->position[]    = html::a($this->createLink('info', 'browse', "libID=$libID"), $libName);
 		}
 		$this->view->position[]    = $this->lang->info->list;
@@ -362,6 +367,11 @@ class info extends control
 	}
 	public function editLib($libID,$type='info')
 	{
+		if ($libID===false || $libID == '') {
+			//there is no default lib
+			echo js::alert('There is No Lib!Cannot Edit!');
+			die(js::locate($this->createLink($type, 'browse', ""), 'parent'));
+		}
 		$this->app->loadLang($type,$exit = false);
 		if(!empty($_POST))
 		{
@@ -388,6 +398,10 @@ class info extends control
 	}
 	public function deleteLib($libID,$type='info',$confirm = 'no')
 	{
+		if ($libID===false || $libID == '') {
+			//there is no default lib
+			die(js::alert('There is No Lib!Cannot Edit!'));
+		}
 		$this->app->loadLang($type,$exit = false);
 		if($libID=='default')
 		{
@@ -663,5 +677,31 @@ class info extends control
 		$this->view->customFields  = $this->info->getFieldPairs($customFields);
 		$this->view->defaultFields = $this->info->getFieldPairs($this->config->info->list->defaultFields);
 		die($this->display());
+	}
+	public function cleanInfoDatabase($confirm1 = 'no', $confirm2 = 'no') {
+		if($confirm1 == 'no')
+		{
+			die(js::confirm($this->lang->info->confirmcleanInfoDatabase, inlink('cleanInfoDatabase', "confirm1=yes")));
+		}
+		else
+		{
+			if($confirm2 == 'no')
+			{
+				die(js::confirm($this->lang->info->confirmcleanInfoDatabaseAgain, inlink('cleanInfoDatabase', "confirm1=yes&confirm2=yes")));
+			}
+			else
+			{
+				$file = $this->app->getModuleExtPath('extension','info') . 'db' . $this->app->getPathFix() . 'cleanAll.sql';
+				if(file_exists($file))
+				{
+					$this->loadModel('upgrade')->execSQL($file);
+				}
+				else
+				{
+					echo js::alert($file.' NOT exist!');
+				}
+				die(js::locate(helper::createLink('extension','browse'), 'parent'));
+			}
+		}
 	}
 }

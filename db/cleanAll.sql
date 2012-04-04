@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS `zt_info`;
+DROP TABLE IF EXISTS `zt_infolib`;
+DROP TABLE IF EXISTS `zt_infomodule`;
+DROP TABLE IF EXISTS `zt_infoasset`;
+DROP TABLE IF EXISTS `zt_inforemind`;
+DELETE FROM `zt_file` WHERE `objectType` LIKE  '%info%';
+DELETE FROM `zt_action` WHERE `objectType` LIKE  '%info%';
+DELETE FROM `zt_action` WHERE `objectType` LIKE  '%asset%';
+DELETE FROM `zt_grouppriv` WHERE `module` LIKE `%info%`;
+DELETE FROM `zt_grouppriv` WHERE `module` LIKE `%asset%`;
+DELETE FROM `zt_config` WHERE `key` = 'infoplugin';
+DELETE FROM `zt_userquery` WHERE `module` = 'info';
+DELETE FROM `zt_userquery` WHERE `module` = 'asset';

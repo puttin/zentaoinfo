@@ -12,3 +12,4 @@ $lang->info->menu->module  = array('link' => 'Module|info|TreeManage|libID=%s','
 $lang->info->menu->asset  = 'Asset|asset|browse|';
 //$lang->info->menu->upgrade  = 'Upgrade Plugin|info|upgrade|';
 $lang->info->menu->create  = array('link' => '<span class="icon-add1">&nbsp;</span>New Library|info|createLib', 'float' => 'right');
+$lang->info->menu->cleanInfoDatabase  = 'cleanInfoDatabase|info|cleanInfoDatabase|';

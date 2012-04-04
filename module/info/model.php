@@ -80,6 +80,10 @@ class infoModel extends model
 	}
 	public function getLibs($type='info')
 	{
+		if (!$this->app->dbh->query('show tables from `'.$this->config->db->name.'` where `Tables_in_'.$this->config->db->name."`='".$this->config->db->prefix."info'")->fetch(PDO::FETCH_OBJ)->{'Tables_in_'.$this->config->db->name}) {
+			echo js::alert('You Hava Delete All the Database Related To This Plugin!!!\nPlease delete this plugin!');
+			die(js::locate(helper::createLink('extension','browse'), 'parent'));
+		}
 		//此处有一个历史遗留问题,0.3版本以前的infolib库里无type列
 		$test=$this->app->dbh->query('desc '.TABLE_INFOLIB.' type')->fetch(PDO::FETCH_OBJ);
 		//print $test->Field.'<br />';

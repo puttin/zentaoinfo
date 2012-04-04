@@ -88,6 +88,9 @@ $lang->info->confirmChangeLib = 'Change library will change module also, are you
 $lang->info->confirmUninstallPlugin   = "Uninstall this plugin will delete all action from TABLE_ACTION so that all infos' history will be LOST! Are you sure you wanna this?";
 $lang->info->pleaseGoToDeletePreuninstall ='Please go to "%s" dir and delete preuninstall.php file before you restart uninstall this plugin.';
 
+$lang->info->confirmcleanInfoDatabase      = "Are you sure you want to clean all database related to this plugin?";
+$lang->info->confirmcleanInfoDatabaseAgain      = "Once Again!ARE YOU SURE YOU WANT TO CLEAN ALL DATABASE RELATED TO THIS PLUGIN?";
+
 /* plugin update*/
 $lang->info->upgradeCommon  = 'Upgrade Plugin';
 $lang->info->upgradeResult  = 'Upgrade Result';
